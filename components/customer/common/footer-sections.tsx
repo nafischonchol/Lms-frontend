@@ -27,8 +27,8 @@ export function SiteFooter() {
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr]">
           {/* Brand column */}
           <div>
-            <p className="text-xl font-black text-white">LMS</p>
-            <p className="mt-1 text-xs font-bold uppercase tracking-widest text-indigo-400">Learning Management System</p>
+            <p className="text-2xl font-black text-white">YRERI</p>
+            <p className="mt-1 text-xs font-bold uppercase tracking-widest text-indigo-400">Youth Revolution - Education &amp; Research Institute</p>
             <p className="mt-3 text-sm leading-relaxed text-slate-400">
               বাংলাদেশের সেরা অনলাইন শিক্ষা প্ল্যাটফর্ম। বিশেষজ্ঞ শিক্ষকদের কাছ থেকে অনলাইন ও অফলাইনে শিখুন এবং ক্যারিয়ার গড়ুন।
             </p>
@@ -97,7 +97,7 @@ export function SiteFooter() {
       {/* Bottom bar */}
       <div className="border-t border-white/10">
         <div className="mx-auto flex w-full max-w-screen-2xl flex-col items-center justify-between gap-2 px-3 py-4 text-xs text-slate-500 sm:flex-row sm:px-4 lg:px-5">
-          <p>© ২০২৬ LMS। সর্বস্বত্ব সংরক্ষিত।</p>
+          <p>© ২০২৬ YRERI — Youth Revolution - Education &amp; Research Institute। সর্বস্বত্ব সংরক্ষিত।</p>
           <p>শিক্ষার্থী সাপোর্ট: support@yreri.com | ২৪/৭ অনলাইন</p>
         </div>
       </div>
