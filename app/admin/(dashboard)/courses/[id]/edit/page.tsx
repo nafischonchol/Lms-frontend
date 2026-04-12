@@ -2,13 +2,11 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { List } from "lucide-react";
 
-import { CourseEnrollmentManager } from "@/components/admin/courses/CourseEnrollmentManager";
 import { CourseForm } from "@/components/admin/courses/CourseForm";
 import { Button } from "@/components/admin/ui/button";
 import { PageHeader } from "@/components/admin/ui/page-header";
 import { getCourseById } from "@/lib/api/courses";
 import { getCategoriesList } from "@/lib/api/categories";
-import { getStudentsList } from "@/lib/api/students";
 import { getTeachersList } from "@/lib/api/teachers";
 
 export default async function EditCoursePage({
@@ -19,11 +17,10 @@ export default async function EditCoursePage({
   const { id } = await params;
   const courseId = Number(id);
 
-  const [course, teachersResult, categoriesResult, studentsResult] = await Promise.all([
+  const [course, teachersResult, categoriesResult] = await Promise.all([
     getCourseById(courseId),
     getTeachersList({ per_page: 200 }),
     getCategoriesList(),
-    getStudentsList({ per_page: 200, is_active: "1" }),
   ]);
 
   if (!course) {
@@ -68,23 +65,6 @@ export default async function EditCoursePage({
         teachers={teachersResult.items.map((t) => ({ id: Number(t.id), name: t.name }))}
         categories={categoriesResult.items.map((c) => ({ id: c.id, name: c.name }))}
       />
-
-      <CourseEnrollmentManager
-        courseId={courseId}
-        students={studentsResult.items.map((student) => ({
-          id: Number(student.id),
-          name: student.name,
-          email: student.email,
-          is_active: student.is_active,
-        }))}
-        enrollments={course.enrollments ?? []}
-      />
-
-      <div className="flex justify-end">
-        <Link href={`/admin/courses/${courseId}/enroll`}>
-          <Button variant="secondary">Open Full Enrollment Manager</Button>
-        </Link>
-      </div>
     </div>
   );
 }
