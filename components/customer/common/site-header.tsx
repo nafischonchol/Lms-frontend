@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, Globe, Menu, Moon, Search, X, Sun } from "lucide-react";
@@ -163,8 +162,8 @@ export function SiteHeader({ navLinks = defaultNavLinks }: { navLinks?: SiteNavL
               <Menu className="h-6 w-6" />
             </button>
 
-            <Link href="/" className="inline-flex items-center">
-              <Image src="/yeri-logo.jpg" alt="Youth Revolution - Education & Research Institute (YRERI)" width={780} height={130} priority className="h-9 w-auto" />
+            <Link href="/" className="inline-flex items-center gap-1">
+              <span className="text-xl font-black tracking-tight text-slate-900">YRERI</span>
             </Link>
 
             <button type="button" className="p-2 text-slate-700"><Search className="h-5 w-5" /></button>
@@ -178,7 +177,7 @@ export function SiteHeader({ navLinks = defaultNavLinks }: { navLinks?: SiteNavL
             {/* Sticky Logo - Absolute Positioned to prevent layout jump */}
             <div className={`absolute left-4 lg:left-6 transition-all duration-300 flex items-center ${isCompact ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-5 pointer-events-none"}`}>
               <Link href="/" className="inline-flex shrink-0 items-center">
-                <Image src="/yeri-logo.jpg" alt="Logo" width={780} height={130} className="h-8 w-auto" />
+                <span className="text-lg font-black tracking-tight text-slate-900">YRERI</span>
               </Link>
             </div>
 
@@ -213,7 +212,9 @@ export function SiteHeader({ navLinks = defaultNavLinks }: { navLinks?: SiteNavL
           <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
           <div className="relative h-full w-[85%] max-w-sm bg-white shadow-2xl transition-all duration-300">
             <div className="flex items-center justify-between border-b px-5 py-5 bg-white sticky top-0">
-              <Link href="/" onClick={() => setIsOpen(false)}><Image src="/yeri-logo.jpg" alt="Logo" width={780} height={130} className="h-9 w-auto" /></Link>
+              <Link href="/" onClick={() => setIsOpen(false)}>
+                <span className="text-xl font-black tracking-tight text-slate-900">YRERI</span>
+              </Link>
               <button onClick={() => setIsOpen(false)} className="rounded-full bg-slate-100 p-2"><X className="h-6 w-6" /></button>
             </div>
             <nav className="p-6 space-y-2">

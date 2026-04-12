@@ -1,12 +1,8 @@
 import type { Metadata } from "next"
 
 import { LmsHeroSection } from "@/components/customer/home/lms-hero-section"
-import { CourseCategoriesSection } from "@/components/customer/home/course-categories-section"
-import { FeaturedCoursesSection } from "@/components/customer/home/featured-courses-section"
 import { LmsFeaturesSection } from "@/components/customer/home/lms-features-section"
-import { LmsStatsSection } from "@/components/customer/home/lms-stats-section"
 import { LmsHowItWorksSection } from "@/components/customer/home/lms-how-it-works-section"
-import { LmsTestimonialsSection } from "@/components/customer/home/lms-testimonials-section"
 import { NewsletterSection } from "@/components/customer/home/newsletter-section"
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? "Youth Revolution - Education & Research Institute (YRERI)"
@@ -45,12 +41,8 @@ export default function Home() {
       <LmsHeroSection />
 
       <main className="mx-auto w-full max-w-screen-2xl px-3 sm:px-4 lg:px-5">
-        <CourseCategoriesSection />
-        <FeaturedCoursesSection />
         <LmsFeaturesSection />
-        <LmsStatsSection />
         <LmsHowItWorksSection />
-        <LmsTestimonialsSection />
         <NewsletterSection />
       </main>
     </>
