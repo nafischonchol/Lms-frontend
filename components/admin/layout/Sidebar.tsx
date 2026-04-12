@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Users,
   Tags,
+  BookOpen,
   ChevronDown,
   ChevronRight,
   X,
@@ -29,6 +30,14 @@ const menuConfig: MenuSection[] = [
     title: "Main",
     items: [
       { title: "Dashboard", icon: LayoutDashboard, href: "/admin" },
+      {
+        title: "Courses",
+        icon: BookOpen,
+        subItems: [
+          { title: "Course List", href: "/admin/courses/list" },
+          { title: "Add Course", href: "/admin/courses/add" },
+        ],
+      },
       {
         title: "Categories",
         icon: Tags,
