@@ -2,40 +2,24 @@ import "server-only";
 
 import { extractPagination, fetchApi, type BasePagination } from "./common";
 
-export type CategoryStatus = "published" | "draft";
-
-export type CategoryParentApiModel = {
-  id: string;
-  title: string;
-  slug: string;
-};
-
-export type CategoryApiModel = {
-  id: string;
-  title: string;
-  slug: string;
-  parent_id: string;
-  parent?: CategoryParentApiModel;
-  status: CategoryStatus;
-  sort_order: string;
-  home_sort_order: string;
-  description: string;
-  meta_title: string;
-  meta_description: string;
-  meta_keywords: string;
-  show_in_menu: boolean;
-  show_on_home: boolean;
-  featured: boolean;
-  og_image_url?: string;
-};
+export interface Category {
+  id: number;
+  name: string;
+  description: string | null;
+  is_active: boolean;
+  courses_count?: number;
+  created_at: string;
+  updated_at: string;
+}
 
 export type GetCategoriesParams = {
   page?: number;
   per_page?: number;
+  search?: string;
 };
 
 export type CategoriesListResult = {
-  items: CategoryApiModel[];
+  items: Category[];
   pagination: BasePagination;
 };
 
@@ -60,104 +44,41 @@ function asBoolean(value: unknown, fallback = false): boolean {
   return fallback;
 }
 
-function normalizeStatus(value: unknown): CategoryStatus {
-  return asString(value, "draft").toLowerCase() === "published" ? "published" : "draft";
+function getMessage(payload: unknown, fallback: string): string {
+  const root = asObject(payload);
+  const message = root.message;
+  return typeof message === "string" && message.trim() ? message : fallback;
 }
 
-function normalizeParentCategory(value: unknown): CategoryParentApiModel | undefined {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return undefined;
-  }
-
-  const parent = asObject(value);
-
-  return {
-    id: asString(parent.id),
-    title: asString(parent.title),
-    slug: asString(parent.slug),
-  };
-}
-
-function normalizeCategory(value: unknown): CategoryApiModel {
+function normalizeCategory(value: unknown): Category {
   const item = asObject(value);
-
   return {
-    id: asString(item.id),
-    title: asString(item.title),
-    slug: asString(item.slug),
-    parent_id: asString(item.parent_id ?? item.parentId),
-    parent: normalizeParentCategory(item.parent),
-    status: normalizeStatus(item.status),
-    sort_order: asString(item.sort_order ?? item.sortOrder ?? "0"),
-    home_sort_order: asString(item.home_sort_order ?? item.homeSortOrder ?? item.sort_order ?? item.sortOrder ?? "0"),
-    description: asString(item.description),
-    meta_title: asString(item.meta_title ?? item.metaTitle),
-    meta_description: asString(item.meta_description ?? item.metaDescription),
-    meta_keywords: asString(item.meta_keywords ?? item.metaKeywords),
-    show_in_menu: asBoolean(item.show_in_menu ?? item.showInMenu, true),
-    show_on_home: asBoolean(item.show_on_home ?? item.showOnHome ?? item.featured, false),
-    featured: asBoolean(item.featured, false),
-    og_image_url: asString(item.og_image_url ?? item.ogImageUrl) || undefined,
+    id: Number(item.id),
+    name: asString(item.name),
+    description: asString(item.description) || null,
+    is_active: asBoolean(item.is_active, true),
+    courses_count: item.courses_count !== undefined ? Number(item.courses_count) : undefined,
+    created_at: asString(item.created_at),
+    updated_at: asString(item.updated_at),
   };
 }
 
 function extractList(payload: unknown): unknown[] {
-  if (Array.isArray(payload)) {
-    return payload;
-  }
-
-  const data = asObject(payload);
-  if (Array.isArray(data.resources)) {
-    return data.resources;
-  }
-
-  const resources = asObject(data.resources);
-
-  const candidates = [
-    resources.categories,
-    resources.items,
-    resources.data,
-    resources,
-    data.categories,
-    data.data,
-  ];
-
-  for (const candidate of candidates) {
-    if (Array.isArray(candidate)) {
-      return candidate;
-    }
-  }
-
+  if (Array.isArray(payload)) return payload;
+  const root = asObject(payload);
+  if (Array.isArray(root.data)) return root.data;
   return [];
 }
 
 function extractOne(payload: unknown): unknown | null {
   if (payload && typeof payload === "object" && !Array.isArray(payload)) {
     const root = payload as Record<string, unknown>;
-    if (root.id !== undefined) {
-      return root;
-    }
+    if (root.id !== undefined) return root;
   }
-
-  const data = asObject(payload);
-
-  if (Array.isArray(data.resources) && data.resources.length > 0) {
-    const first = data.resources[0];
-    if (first && typeof first === "object" && !Array.isArray(first)) {
-      return first;
-    }
+  const root = asObject(payload);
+  if (root.data && typeof root.data === "object" && !Array.isArray(root.data)) {
+    return root.data;
   }
-
-  const resources = asObject(data.resources);
-
-  const candidates = [resources.category, resources.item, data.category, data.data, resources.data, resources];
-
-  for (const candidate of candidates) {
-    if (candidate && typeof candidate === "object" && !Array.isArray(candidate)) {
-      return candidate;
-    }
-  }
-
   return null;
 }
 
@@ -167,22 +88,16 @@ export async function getCategoriesList(params?: GetCategoriesParams): Promise<C
 
   try {
     const query = new URLSearchParams();
-
-    if (params?.page !== undefined) {
-      query.set("page", String(params.page));
-    }
-
-    if (params?.per_page !== undefined) {
-      query.set("per_page", String(params.per_page));
-    }
+    if (params?.page !== undefined) query.set("page", String(params.page));
+    if (params?.per_page !== undefined) query.set("per_page", String(params.per_page));
+    if (params?.search?.trim()) query.set("search", params.search.trim());
 
     const path = query.toString() ? `/admin/categories?${query.toString()}` : "/admin/categories";
-
     const response = await fetchApi(path);
     const payload = await response.json().catch(() => null);
 
     if (!response.ok) {
-      throw new Error((payload as any)?.message || "Failed to load categories.");
+      throw new Error(getMessage(payload, "Failed to load categories."));
     }
 
     return {
@@ -193,42 +108,23 @@ export async function getCategoriesList(params?: GetCategoriesParams): Promise<C
     console.error("Failed to fetch categories:", error);
     return {
       items: [],
-      pagination: {
-        currentPage: fallbackPage,
-        lastPage: fallbackPage,
-        perPage: fallbackPerPage,
-        total: 0,
-      },
+      pagination: { currentPage: fallbackPage, lastPage: fallbackPage, perPage: fallbackPerPage, total: 0 },
     };
   }
 }
 
-export async function getCategories(params?: GetCategoriesParams): Promise<CategoryApiModel[]> {
-  const { items } = await getCategoriesList(params);
-  return items;
-}
-
-export async function getCategoryById(catId: string): Promise<CategoryApiModel | null> {
+export async function getCategoryById(categoryId: number): Promise<Category | null> {
   try {
-    const response = await fetchApi(`/admin/categories/${catId}`);
+    const response = await fetchApi(`/admin/categories/${categoryId}`);
     const payload = await response.json().catch(() => null);
 
-    if (response.status === 404) {
-      return null;
-    }
-
-    if (!response.ok) {
-      throw new Error((payload as any)?.message || "Failed to load category.");
-    }
+    if (response.status === 404) return null;
+    if (!response.ok) throw new Error(getMessage(payload, "Failed to load category."));
 
     const item = extractOne(payload);
-    if (!item) {
-      return null;
-    }
-
-    return normalizeCategory(item);
+    return item ? normalizeCategory(item) : null;
   } catch (error) {
-    console.error(`Failed to fetch category ${catId}:`, error);
+    console.error(`Failed to fetch category ${categoryId}:`, error);
     return null;
   }
 }
