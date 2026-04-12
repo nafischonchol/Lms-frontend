@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Save } from "lucide-react";
 
@@ -51,6 +52,19 @@ const defaultValues: CourseFormValues = {
   category_id: "",
 };
 
+function resolveThumbnailUrl(value?: string) {
+  if (!value?.trim()) return null;
+  if (value.startsWith("http://") || value.startsWith("https://")) {
+    return value;
+  }
+
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const appBaseUrl = apiBaseUrl?.replace(/\/api\/?$/, "") ?? "";
+  const normalizedPath = value.startsWith("/") ? value : `/storage/${value}`;
+
+  return appBaseUrl ? `${appBaseUrl}${normalizedPath}` : normalizedPath;
+}
+
 export function CourseForm({
   mode,
   courseId,
@@ -63,6 +77,10 @@ export function CourseForm({
     ...defaultValues,
     ...initialValues,
   });
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreviewUrl, setThumbnailPreviewUrl] = useState<string | null>(
+    resolveThumbnailUrl(initialValues?.thumbnail),
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
@@ -71,6 +89,20 @@ export function CourseForm({
   function setField<K extends keyof CourseFormValues>(key: K, value: CourseFormValues[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
+
+  useEffect(() => {
+    if (!thumbnailFile) {
+      setThumbnailPreviewUrl(resolveThumbnailUrl(form.thumbnail));
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(thumbnailFile);
+    setThumbnailPreviewUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [thumbnailFile, form.thumbnail]);
 
   return (
     <form
@@ -89,7 +121,7 @@ export function CourseForm({
         const payload = new FormData();
         payload.append("title", form.title);
         if (form.description.trim()) payload.append("description", form.description);
-        if (form.thumbnail.trim()) payload.append("thumbnail", form.thumbnail);
+        if (thumbnailFile) payload.append("thumbnail", thumbnailFile);
         if (form.price.trim()) payload.append("price", form.price);
         if (form.duration.trim()) payload.append("duration", form.duration);
         if (form.mode) payload.append("mode", form.mode);
@@ -159,16 +191,39 @@ export function CourseForm({
             />
           </div>
 
-          {/* Thumbnail URL */}
+          {/* Thumbnail */}
           <div className="space-y-1.5">
-            <Label htmlFor="thumbnail">Thumbnail URL</Label>
+            <Label htmlFor="thumbnail">Thumbnail Image</Label>
             <Input
               id="thumbnail"
-              value={form.thumbnail}
-              onChange={(e) => setField("thumbnail", e.target.value)}
-              placeholder="https://example.com/image.jpg"
-              type="url"
+              type="file"
+              accept="image/*"
+              onChange={(event) => {
+                const file = event.target.files?.[0] ?? null;
+                setThumbnailFile(file);
+              }}
             />
+            <p className="text-xs text-slate-500">Upload JPG, PNG, or WebP image up to 2MB.</p>
+
+            {thumbnailFile ? (
+              <p className="text-sm text-slate-600">Selected file: {thumbnailFile.name}</p>
+            ) : null}
+
+            {thumbnailPreviewUrl ? (
+              <div className="space-y-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                  {thumbnailFile ? "New preview" : "Current thumbnail"}
+                </p>
+                <Image
+                  src={thumbnailPreviewUrl}
+                  alt="Course thumbnail preview"
+                  width={192}
+                  height={128}
+                  unoptimized
+                  className="h-32 w-48 rounded-md object-cover"
+                />
+              </div>
+            ) : null}
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
