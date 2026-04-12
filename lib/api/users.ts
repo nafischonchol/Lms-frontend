@@ -6,18 +6,14 @@ export type UserApiModel = {
   id: string;
   name: string;
   email: string;
-  phone: string;
   is_active: boolean;
-  role_id: string;
-  role_name: string;
-  can_manage_news: boolean;
 };
 
 export type GetUsersParams = {
   page?: number;
   per_page?: number;
   search?: string;
-  role_id?: string;
+  is_active?: "1" | "0";
 };
 
 export type UsersListResult = {
@@ -27,6 +23,12 @@ export type UsersListResult = {
 
 function asObject(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+}
+
+function getMessage(payload: unknown, fallback: string): string {
+  const root = asObject(payload);
+  const message = root.message;
+  return typeof message === "string" && message.trim() ? message : fallback;
 }
 
 function asString(value: unknown, fallback = ""): string {
@@ -49,17 +51,12 @@ function asBoolean(value: unknown, fallback = false): boolean {
 
 function normalizeUser(value: unknown): UserApiModel {
   const item = asObject(value);
-  const role = asObject(item.role);
 
   return {
     id: asString(item.id),
     name: asString(item.name),
     email: asString(item.email),
-    phone: asString(item.phone),
     is_active: asBoolean(item.is_active, true),
-    role_id: asString(item.role_id ?? role.id),
-    role_name: asString(item.role_name ?? role.name),
-    can_manage_news: asBoolean(item.can_manage_news, false),
   };
 }
 
@@ -119,8 +116,8 @@ export async function getUsersList(params?: GetUsersParams): Promise<UsersListRe
       query.set("search", params.search.trim());
     }
 
-    if (params?.role_id?.trim()) {
-      query.set("role_id", params.role_id.trim());
+    if (params?.is_active !== undefined) {
+      query.set("is_active", params.is_active);
     }
 
     const path = query.toString() ? `/admin/users?${query.toString()}` : "/admin/users";
@@ -129,7 +126,7 @@ export async function getUsersList(params?: GetUsersParams): Promise<UsersListRe
     const payload = await response.json().catch(() => null);
 
     if (!response.ok) {
-      throw new Error((payload as any)?.message || "Failed to load users.");
+      throw new Error(getMessage(payload, "Failed to load users."));
     }
 
     return {
@@ -165,7 +162,7 @@ export async function getUserById(userId: string): Promise<UserApiModel | null> 
     }
 
     if (!response.ok) {
-      throw new Error((payload as any)?.message || "Failed to load user details.");
+      throw new Error(getMessage(payload, "Failed to load user details."));
     }
 
     const item = extractOne(payload);

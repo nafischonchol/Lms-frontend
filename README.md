@@ -1,6 +1,6 @@
-# Shikkhapath News Portal
+# yreri LMS
 
-Shikkhapath is a Next.js 16 news portal with:
+yreri is a Next.js 16 news portal with:
 
 - A public customer-facing site for Bangla news content.
 - An admin area for authenticated management workflows.

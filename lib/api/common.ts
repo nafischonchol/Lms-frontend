@@ -101,7 +101,7 @@ export function extractPagination(
   fallbackPage: number,
   fallbackPerPage: number,
 ): BasePagination {
-  const pagination = payload?.pagination ?? payload?.meta?.pagination ?? payload?.meta;
+  const pagination = payload?.pagination ?? payload?.meta?.pagination ?? payload?.meta ?? payload;
 
   return {
     currentPage: Math.max(

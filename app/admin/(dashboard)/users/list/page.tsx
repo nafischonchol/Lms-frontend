@@ -5,6 +5,7 @@ import { Button } from "@/components/admin/ui/button";
 import { Card, CardContent } from "@/components/admin/ui/card";
 import { PageHeader } from "@/components/admin/ui/page-header";
 import { UsersListFilters } from "@/components/admin/users/UsersListFilters";
+import { UserStatusToggleButton } from "@/components/admin/users/UserStatusToggleButton";
 import { getUsersList } from "@/lib/api/users";
 
 function formatBoolean(value: boolean, trueLabel: string, falseLabel: string) {
@@ -73,10 +74,7 @@ export default async function UsersListPage({
                   <th className="px-6 py-4 font-semibold">ID</th>
                   <th className="px-6 py-4 font-semibold">Name</th>
                   <th className="px-6 py-4 font-semibold">Email</th>
-                  <th className="px-6 py-4 font-semibold">Phone</th>
-                  <th className="px-6 py-4 font-semibold">Role</th>
                   <th className="px-6 py-4 font-semibold">Status</th>
-                  <th className="px-6 py-4 font-semibold">Manage News</th>
                   <th className="px-6 py-4 font-semibold text-right">Action</th>
                 </tr>
               </thead>
@@ -86,23 +84,23 @@ export default async function UsersListPage({
                     <td className="px-6 py-4 text-slate-600">#{user.id}</td>
                     <td className="px-6 py-4 font-medium text-slate-800">{user.name}</td>
                     <td className="px-6 py-4 text-slate-600">{user.email}</td>
-                    <td className="px-6 py-4 text-slate-600">{user.phone || "-"}</td>
-                    <td className="px-6 py-4 text-slate-600">{user.role_name || user.role_id || "-"}</td>
                     <td className="px-6 py-4 text-slate-600">{formatBoolean(user.is_active, "Active", "Inactive")}</td>
-                    <td className="px-6 py-4 text-slate-600">{formatBoolean(user.can_manage_news, "Yes", "No")}</td>
                     <td className="px-6 py-4 text-right">
-                      <Link href={`/admin/users/${user.id}/edit`}>
-                        <Button variant="secondary" size="sm">
-                          <Pencil size={14} />
-                          Edit
-                        </Button>
-                      </Link>
+                      <div className="flex items-center justify-end gap-2">
+                        <UserStatusToggleButton userId={user.id} isActive={user.is_active} />
+                        <Link href={`/admin/users/${user.id}/edit`}>
+                          <Button variant="secondary" size="sm">
+                            <Pencil size={14} />
+                            Edit
+                          </Button>
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}
                 {users.length === 0 ? (
                   <tr>
-                    <td className="px-6 py-8 text-center text-slate-500" colSpan={8}>
+                    <td className="px-6 py-8 text-center text-slate-500" colSpan={5}>
                       No users found.
                     </td>
                   </tr>

@@ -24,9 +24,9 @@ export async function loginUser(email: string, password: string) {
     throw new Error(data?.message || "Invalid credentials provided.");
   }
 
-  if (data?.resources?.token) {
+  if (data?.token) {
     const cookieStore = await cookies();
-    cookieStore.set("admin_token", data.resources.token, {
+    cookieStore.set("admin_token", data.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax", // Using lax for better compatibility

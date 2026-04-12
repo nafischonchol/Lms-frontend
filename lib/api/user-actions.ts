@@ -77,3 +77,30 @@ export async function updateUserAction(userId: string, payload: FormData): Promi
     };
   }
 }
+
+export async function toggleUserStatusAction(userId: string): Promise<UserActionResult> {
+  try {
+    const response = await fetchApi(`/admin/users/${userId}/toggle-status`, {
+      method: "PATCH",
+    });
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      return {
+        ok: false,
+        message: getMessage(data, "Failed to update user status."),
+      };
+    }
+
+    revalidatePath("/admin/users/list");
+    return {
+      ok: true,
+      message: getMessage(data, "User status updated successfully."),
+    };
+  } catch {
+    return {
+      ok: false,
+      message: "User API is unavailable.",
+    };
+  }
+}

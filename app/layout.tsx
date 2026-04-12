@@ -13,9 +13,9 @@ const sourceSerif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "Shikkhapath",
+  title: "yreri",
   description:
-    "Shikkhapath-Modern News Portal is a cutting-edge news platform built with Next.js, designed to deliver the latest news and updates in a sleek and user-friendly interface. With its modern design and seamless navigation, Shikkhapath offers an engaging experience for users seeking up-to-date information on various topics. Stay informed with Shikkhapath's comprehensive coverage and intuitive features.z",
+    "yreri LMS Portal is a cutting-edge news platform built with Next.js, designed to deliver the latest news and updates in a sleek and user-friendly interface. With its modern design and seamless navigation, yreri offers an engaging experience for users seeking up-to-date information on various topics. Stay informed with yreri's comprehensive coverage and intuitive features.z",
 };
 
 export default function RootLayout({

@@ -1,6 +1,6 @@
 module.exports = {
   apps : [{
-    name: "SHIKKHAPATH",
+    name: "yreri",
     script: "npm",
     args: "start",
     env: {

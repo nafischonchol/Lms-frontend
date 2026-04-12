@@ -98,7 +98,7 @@ export function SiteFooter() {
       <div className="border-t border-white/10">
         <div className="mx-auto flex w-full max-w-screen-2xl flex-col items-center justify-between gap-2 px-3 py-4 text-xs text-slate-500 sm:flex-row sm:px-4 lg:px-5">
           <p>© ২০২৬ LMS। সর্বস্বত্ব সংরক্ষিত।</p>
-          <p>শিক্ষার্থী সাপোর্ট: support@shikkhapath.com | ২৪/৭ অনলাইন</p>
+          <p>শিক্ষার্থী সাপোর্ট: support@yreri.com | ২৪/৭ অনলাইন</p>
         </div>
       </div>
     </footer>

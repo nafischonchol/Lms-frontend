@@ -15,18 +15,15 @@ import { createUserAction, updateUserAction } from "@/lib/api/user-actions";
 export type UserFormValues = {
   name: string;
   email: string;
-  phone: string;
   password: string;
-  role_id: string;
+  password_confirmation: string;
   is_active: "1" | "0";
-  can_manage_news: "1" | "0";
 };
 
 type UserFormProps = {
   mode: "add" | "edit";
   userId?: string;
   initialValues?: Partial<UserFormValues>;
-  roleOptions: { id: string; name: string }[];
   showDetailsHeader?: boolean;
   headerTitle?: string;
   headerAction?: React.ReactNode;
@@ -35,18 +32,15 @@ type UserFormProps = {
 const defaultValues: UserFormValues = {
   name: "",
   email: "",
-  phone: "",
   password: "",
-  role_id: "",
+  password_confirmation: "",
   is_active: "1",
-  can_manage_news: "0",
 };
 
 export function UserForm({
   mode,
   userId,
   initialValues,
-  roleOptions,
   showDetailsHeader = true,
   headerTitle,
   headerAction,
@@ -79,13 +73,14 @@ export function UserForm({
         const payload = new FormData();
         payload.append("name", form.name);
         payload.append("email", form.email);
-        payload.append("phone", form.phone);
-        payload.append("role_id", form.role_id);
-        payload.append("is_active", form.is_active);
-        payload.append("can_manage_news", form.can_manage_news);
+
+        if (mode === "add") {
+          payload.append("is_active", form.is_active);
+        }
 
         if (mode === "add" || form.password.trim()) {
           payload.append("password", form.password);
+          payload.append("password_confirmation", form.password_confirmation);
         }
 
         try {
@@ -148,16 +143,6 @@ export function UserForm({
 
           <div className="grid gap-5 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
-              <Input
-                id="phone"
-                value={form.phone}
-                onChange={(event) => setForm((prev) => ({ ...prev, phone: event.target.value }))}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"
@@ -168,57 +153,39 @@ export function UserForm({
                 required={mode === "add"}
               />
             </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password_confirmation">Confirm Password</Label>
+              <Input
+                id="password_confirmation"
+                type="password"
+                value={form.password_confirmation}
+                placeholder={mode === "edit" ? "Fill when changing password" : "Retype password"}
+                onChange={(event) =>
+                  setForm((prev) => ({ ...prev, password_confirmation: event.target.value }))
+                }
+                required={mode === "add" || form.password.trim().length > 0}
+              />
+            </div>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-3">
-            <div className="space-y-2">
-              <Label htmlFor="role_id">Role</Label>
-              <Select
-                id="role_id"
-                value={form.role_id}
-                required
-                onChange={(event) => setForm((prev) => ({ ...prev, role_id: event.target.value }))}
-              >
-                <option value="">Select Role</option>
-                {roleOptions.map((role) => (
-                  <option key={role.id} value={role.id}>
-                    {role.name}
-                  </option>
-                ))}
-              </Select>
+          {mode === "add" ? (
+            <div className="grid gap-5 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="is_active">Status</Label>
+                <Select
+                  id="is_active"
+                  value={form.is_active}
+                  onChange={(event) =>
+                    setForm((prev) => ({ ...prev, is_active: event.target.value as UserFormValues["is_active"] }))
+                  }
+                >
+                  <option value="1">Active</option>
+                  <option value="0">Inactive</option>
+                </Select>
+              </div>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="is_active">Status</Label>
-              <Select
-                id="is_active"
-                value={form.is_active}
-                onChange={(event) =>
-                  setForm((prev) => ({ ...prev, is_active: event.target.value as UserFormValues["is_active"] }))
-                }
-              >
-                <option value="1">Active</option>
-                <option value="0">Inactive</option>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="can_manage_news">Can Manage News</Label>
-              <Select
-                id="can_manage_news"
-                value={form.can_manage_news}
-                onChange={(event) =>
-                  setForm((prev) => ({
-                    ...prev,
-                    can_manage_news: event.target.value as UserFormValues["can_manage_news"],
-                  }))
-                }
-              >
-                <option value="1">Yes</option>
-                <option value="0">No</option>
-              </Select>
-            </div>
-          </div>
+          ) : null}
         </CardContent>
       </Card>
 
