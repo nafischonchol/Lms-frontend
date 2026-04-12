@@ -44,6 +44,7 @@ const menuConfig: MenuSection[] = [
         icon: Users,
         subItems: [
           { title: "Teachers", href: "/admin/teachers/list" },
+          { title: "Students", href: "/admin/students/list" },
           { title: "Roles", href: "/admin/roles/list" },
           { title: "Users", href: "/admin/users/list" },
         ],
@@ -134,7 +135,7 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <path d="M22 22H2" />
               </svg>
             </div>
-            Shikkhapath
+            YRERI
           </Link>
           <button
             onClick={onClose}

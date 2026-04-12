@@ -13,7 +13,7 @@ const sourceSerif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "Online Learning Management System",
+  title: "Youth Revolution - Education & Research Institute",
   description:
     "বাংলাদেশের সেরা অনলাইন শিক্ষা প্ল্যাটফর্ম। অনলাইন ও অফলাইন কোর্স, লাইভ ক্লাস এবং সার্টিফিকেট।",
 };

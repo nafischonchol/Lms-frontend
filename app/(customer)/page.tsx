@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     `${SITE_NAME} — অনলাইন ও অফলাইনে শিখুন। Web Development, Python, Design, English সহ ৫০০+ কোর্স। বিশেষজ্ঞ শিক্ষকদের কাছ থেকে সার্টিফিকেট কোর্স করুন।`,
   alternates: { canonical: "/" },
   openGraph: {
-    title: `${SITE_NAME} | Learning Management System`,
+    title: `${SITE_NAME} | Youth Revolution - Education & Research Institute`,
     description: "বাংলাদেশের সেরা অনলাইন শিক্ষা প্ল্যাটফর্ম। অনলাইন ও অফলাইন কোর্স, লাইভ ক্লাস এবং সার্টিফিকেট।",
     type: "website",
     url: SITE_URL,
