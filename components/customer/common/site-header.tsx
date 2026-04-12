@@ -13,17 +13,13 @@ export type SiteNavLink = {
 };
 
 const defaultNavLinks: SiteNavLink[] = [
-  { label: "সর্বশেষ", href: "/category/latest" },
-  { label: "শিক্ষাঙ্গন", href: "/category/education", hasDropdown: true },
-  { label: "উচ্চশিক্ষা", href: "/category/higher-education", hasDropdown: true },
-  { label: "শিক্ষা প্রশাসন", href: "/category/administration", hasDropdown: true },
-  { label: "ভর্তি পরীক্ষা", href: "/category/admission", hasDropdown: true },
-  { label: "কর্মসংস্থান", href: "/category/career", hasDropdown: true },
-  { label: "বিনোদন", href: "/category/entertainment" },
-  { label: "খেলাধুলা", href: "/category/sports" },
-  { label: "অর্থনীতি", href: "/category/economy" },
-  { label: "জাতীয়", href: "/category/national", hasDropdown: true },
-  { label: "আরও", href: "/category/national", hasDropdown: true },
+  { label: "হোম", href: "/" },
+  { label: "কোর্সসমূহ", href: "/courses", hasDropdown: true },
+  { label: "লাইভ ক্লাস", href: "/courses/live" },
+  { label: "ক্যাটাগরি", href: "/courses/categories", hasDropdown: true },
+  { label: "শিক্ষকমণ্ডলী", href: "/instructors" },
+  { label: "আমাদের সম্পর্কে", href: "/about" },
+  { label: "যোগাযোগ", href: "/contact-us" },
 ];
 
 export function SiteHeader({ navLinks = defaultNavLinks }: { navLinks?: SiteNavLink[] }) {
@@ -184,7 +180,7 @@ export function SiteHeader({ navLinks = defaultNavLinks }: { navLinks?: SiteNavL
                  <Search className="absolute left-4 h-5 w-5 text-slate-400" />
                  <input 
                     type="text" 
-                    placeholder="পছন্দের সংবাদটি খুঁজুন..."
+                    placeholder="কোর্স বা বিষয় খুঁজুন..."
                     autoFocus={isSearchOpen}
                     className="w-full rounded-2xl border-none bg-white py-3.5 pl-12 pr-12 text-base font-bold text-slate-900 shadow-sm ring-1 ring-slate-200 focus:ring-2 focus:ring-[#c79a1d]"
                  />
@@ -271,7 +267,7 @@ export function SiteHeader({ navLinks = defaultNavLinks }: { navLinks?: SiteNavL
               ))}
             </nav>
             <div className="px-6 mt-10">
-              <Link href="/contact-us" onClick={() => setIsOpen(false)} className="flex items-center justify-center rounded-2xl bg-[#c79a1d] py-4.5 text-white font-bold shadow-lg shadow-[#c79a1d]/20 transition-all hover:bg-[#b38716]">যোগাযোগ করুন</Link>
+              <Link href="/register" onClick={() => setIsOpen(false)} className="flex items-center justify-center rounded-2xl bg-indigo-600 py-4.5 text-white font-bold shadow-lg shadow-indigo-200/50 transition-all hover:bg-indigo-700">ভর্তি হোন</Link>
             </div>
           </div>
         </div>
