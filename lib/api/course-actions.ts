@@ -96,3 +96,50 @@ export async function deleteCourseAction(courseId: string): Promise<CourseAction
     return { ok: false, message: "Course API is unavailable." };
   }
 }
+
+export async function enrollStudentToCourseAction(payload: FormData): Promise<CourseActionResult> {
+  try {
+    const response = await fetchApi("/admin/enroll", {
+      method: "POST",
+      body: payload,
+    });
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      return { ok: false, message: getMessage(data, "Failed to enroll student.") };
+    }
+
+    const courseId = payload.get("course_id");
+    if (typeof courseId === "string" && courseId) {
+      revalidatePath(`/admin/courses/${courseId}/edit`);
+    }
+    revalidatePath("/admin/courses/list");
+
+    return { ok: true, message: getMessage(data, "Student enrolled successfully.") };
+  } catch {
+    return { ok: false, message: "Course API is unavailable." };
+  }
+}
+
+export async function unenrollStudentFromCourseAction(
+  studentId: string,
+  courseId: string,
+): Promise<CourseActionResult> {
+  try {
+    const response = await fetchApi(`/admin/students/${studentId}/unenroll/${courseId}`, {
+      method: "DELETE",
+    });
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      return { ok: false, message: getMessage(data, "Failed to unenroll student.") };
+    }
+
+    revalidatePath(`/admin/courses/${courseId}/edit`);
+    revalidatePath("/admin/courses/list");
+
+    return { ok: true, message: getMessage(data, "Student unenrolled successfully.") };
+  } catch {
+    return { ok: false, message: "Course API is unavailable." };
+  }
+}

@@ -16,10 +16,26 @@ export type CourseApiModel = {
   status: "draft" | "published" | "archived";
   is_active: boolean;
   enrollments_count?: number;
+  enrollments?: CourseEnrollmentApiModel[];
   instructor?: { id: number; name: string } | null;
   category?: { id: number; name: string } | null;
   created_at: string;
   updated_at: string;
+};
+
+export type CourseEnrollmentApiModel = {
+  id: number;
+  student_id: number;
+  course_id: number;
+  fee: string | null;
+  enrolled_at: string | null;
+  completed_at: string | null;
+  student: {
+    id: number;
+    name: string;
+    email: string;
+    is_active: boolean;
+  } | null;
 };
 
 export type GetCoursesParams = {
@@ -68,6 +84,30 @@ function asStringOrNull(value: unknown): string | null {
   if (typeof value === "string" && value.trim()) return value;
   if (typeof value === "number") return String(value);
   return null;
+}
+
+function normalizeEnrollment(value: unknown): CourseEnrollmentApiModel {
+  const item = asObject(value);
+  const studentRaw = item.student;
+  const student =
+    studentRaw && typeof studentRaw === "object" && !Array.isArray(studentRaw)
+      ? {
+          id: Number((studentRaw as Record<string, unknown>).id),
+          name: asString((studentRaw as Record<string, unknown>).name),
+          email: asString((studentRaw as Record<string, unknown>).email),
+          is_active: asBoolean((studentRaw as Record<string, unknown>).is_active, true),
+        }
+      : null;
+
+  return {
+    id: Number(item.id),
+    student_id: Number(item.student_id),
+    course_id: Number(item.course_id),
+    fee: asStringOrNull(item.fee),
+    enrolled_at: asStringOrNull(item.enrolled_at),
+    completed_at: asStringOrNull(item.completed_at),
+    student,
+  };
 }
 
 function normalizeCourse(value: unknown): CourseApiModel {
@@ -120,6 +160,9 @@ function normalizeCourse(value: unknown): CourseApiModel {
     is_active: asBoolean(item.is_active, true),
     enrollments_count:
       item.enrollments_count !== undefined ? Number(item.enrollments_count) : undefined,
+    enrollments: Array.isArray(item.enrollments)
+      ? item.enrollments.map(normalizeEnrollment)
+      : undefined,
     instructor,
     category,
     created_at: asString(item.created_at),

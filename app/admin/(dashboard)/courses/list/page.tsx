@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Pencil } from "lucide-react";
+import { Plus, Pencil, UserPlus } from "lucide-react";
 
 import { Button } from "@/components/admin/ui/button";
 import { Card, CardContent } from "@/components/admin/ui/card";
@@ -99,6 +99,12 @@ export default async function CoursesListPage({
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        <Link href={`/admin/courses/${course.id}/enroll`}>
+                          <Button variant="secondary" size="sm">
+                            <UserPlus size={14} />
+                            Enroll
+                          </Button>
+                        </Link>
                         <CourseStatusToggleButton
                           courseId={course.id}
                           isActive={course.is_active}
