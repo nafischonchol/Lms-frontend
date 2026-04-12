@@ -1,8 +1,12 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
+
 import { getCategoriesList } from "@/lib/api/categories";
 import { CategoriesListFilters } from "@/components/admin/categories/CategoriesListFilters";
 import { DeleteCategoryButton } from "@/components/admin/categories/DeleteCategoryButton";
-import { CategoryForm } from "@/components/admin/categories/CategoryForm";
+import { Button } from "@/components/admin/ui/button";
+import { Card, CardContent } from "@/components/admin/ui/card";
+import { PageHeader } from "@/components/admin/ui/page-header";
 
 interface CategoriesListPageProps {
   searchParams?: Promise<{ search?: string }>;
@@ -15,106 +19,75 @@ export default async function CategoriesListPage({ searchParams }: CategoriesLis
   const { items: categories } = await getCategoriesList({ search });
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 items-start">
-      {/* Category List */}
-      <div className="flex-1 min-w-0 bg-white rounded-lg shadow p-6">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Categories</h1>
-        </div>
+    <div className="w-full space-y-6 px-3 py-4 md:px-4 lg:px-5">
+      <PageHeader
+        title=""
+        breadcrumbs={[{ label: "Home", href: "/admin" }, { label: "Categories" }]}
+      />
 
-        <CategoriesListFilters />
+      <Card>
+        <CardContent className="p-0">
+          <div className="flex items-center justify-between gap-4 border-b border-slate-100 p-4 md:p-6">
+            <CategoriesListFilters />
 
-        {categories.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No categories found</p>
+            <Link href="/admin/categories/add">
+              <Button>
+                <Plus size={16} />
+                Add Category
+              </Button>
+            </Link>
           </div>
-        ) : (
-          <>
+
+          {categories.length === 0 ? (
+            <div className="px-6 py-12 text-center text-slate-500">No categories found.</div>
+          ) : (
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50 border-b">
+              <table className="w-full text-left text-sm">
+                <thead className="bg-slate-50 text-slate-500 shadow-[0_1px_0_rgba(0,0,0,0.05)]">
                   <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Name</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 hidden md:table-cell">Description</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Courses</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900">Actions</th>
+                    <th className="px-6 py-4 font-semibold">Name</th>
+                    <th className="px-6 py-4 font-semibold hidden md:table-cell">Description</th>
+                    <th className="px-6 py-4 font-semibold">Courses</th>
+                    <th className="px-6 py-4 font-semibold">Status</th>
+                    <th className="px-6 py-4 font-semibold text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+                <tbody className="divide-y divide-slate-100">
                   {categories.map((category) => (
-                    <tr key={category.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900">{category.name}</td>
-                      <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate hidden md:table-cell">
-                        {category.description || "-"}
+                    <tr key={category.id} className="hover:bg-slate-50/70 transition-colors">
+                      <td className="px-6 py-4 font-medium text-slate-800">{category.name}</td>
+                      <td className="px-6 py-4 text-slate-600 hidden max-w-xs md:table-cell">
+                        <div className="truncate">{category.description || "-"}</div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{category.courses_count || 0}</td>
-                      <td className="px-4 py-3 text-sm">
+                      <td className="px-6 py-4 text-slate-600">{category.courses_count || 0}</td>
+                      <td className="px-6 py-4 text-slate-600">
                         <span
-                          className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
-                            category.is_active ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"
+                          className={`inline-block rounded-full px-2 py-1 text-xs font-semibold ${
+                            category.is_active ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-600"
                           }`}
                         >
                           {category.is_active ? "Active" : "Inactive"}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-sm flex gap-3">
-                        <Link
-                          href={`/admin/categories/${category.id}/edit`}
-                          className="text-blue-600 hover:text-blue-800 font-medium"
-                        >
-                          Edit
-                        </Link>
-                        <DeleteCategoryButton categoryId={category.id} />
+                      <td className="px-6 py-4">
+                        <div className="flex items-center justify-end gap-3">
+                          <Link
+                            href={`/admin/categories/${category.id}/edit`}
+                            className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
+                          >
+                            Edit
+                          </Link>
+                          <DeleteCategoryButton categoryId={category.id} />
+                        </div>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-
-            {pagination.lastPage > 1 && (
-              <div className="mt-6 flex justify-center gap-2">
-                {pagination.currentPage > 1 && (
-                  <Link
-                    href={`?page=${pagination.currentPage - 1}${search ? `&search=${encodeURIComponent(search)}` : ""}`}
-                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    Previous
-                  </Link>
-                )}
-                {Array.from({ length: pagination.lastPage }, (_, i) => i + 1).map((p) => (
-                  <Link
-                    key={p}
-                    href={`?page=${p}${search ? `&search=${encodeURIComponent(search)}` : ""}`}
-                    className={`px-3 py-2 rounded-lg ${
-                      pagination.currentPage === p
-                        ? "bg-blue-600 text-white"
-                        : "border border-gray-300 hover:bg-gray-50"
-                    }`}
-                  >
-                    {p}
-                  </Link>
-                ))}
-                {pagination.currentPage < pagination.lastPage && (
-                  <Link
-                    href={`?page=${pagination.currentPage + 1}${search ? `&search=${encodeURIComponent(search)}` : ""}`}
-                    className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    Next
-                  </Link>
-                )}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* Add Category Form */}
-      <div className="w-full lg:w-80 xl:w-96 bg-white rounded-lg shadow p-6 lg:sticky lg:top-6">
-        <h2 className="text-xl font-bold text-gray-900 mb-5">Add New Category</h2>
-        <CategoryForm mode="add" onSuccess={() => {}} />
-      </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
