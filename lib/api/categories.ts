@@ -1,6 +1,6 @@
 import "server-only";
 
-import { extractPagination, fetchApi, type BasePagination } from "./common";
+import { fetchApi } from "./common";
 
 export interface Category {
   id: number;
@@ -13,14 +13,12 @@ export interface Category {
 }
 
 export type GetCategoriesParams = {
-  page?: number;
-  per_page?: number;
   search?: string;
+  is_active?: boolean;
 };
 
 export type CategoriesListResult = {
   items: Category[];
-  pagination: BasePagination;
 };
 
 function asObject(value: unknown): Record<string, unknown> {
@@ -83,14 +81,10 @@ function extractOne(payload: unknown): unknown | null {
 }
 
 export async function getCategoriesList(params?: GetCategoriesParams): Promise<CategoriesListResult> {
-  const fallbackPage = params?.page ?? 1;
-  const fallbackPerPage = params?.per_page ?? 20;
-
   try {
     const query = new URLSearchParams();
-    if (params?.page !== undefined) query.set("page", String(params.page));
-    if (params?.per_page !== undefined) query.set("per_page", String(params.per_page));
     if (params?.search?.trim()) query.set("search", params.search.trim());
+    if (params?.is_active !== undefined) query.set("is_active", String(params.is_active));
 
     const path = query.toString() ? `/admin/categories?${query.toString()}` : "/admin/categories";
     const response = await fetchApi(path);
@@ -102,14 +96,10 @@ export async function getCategoriesList(params?: GetCategoriesParams): Promise<C
 
     return {
       items: extractList(payload).map(normalizeCategory),
-      pagination: extractPagination(payload, fallbackPage, fallbackPerPage),
     };
   } catch (error) {
     console.error("Failed to fetch categories:", error);
-    return {
-      items: [],
-      pagination: { currentPage: fallbackPage, lastPage: fallbackPage, perPage: fallbackPerPage, total: 0 },
-    };
+    return { items: [] };
   }
 }
 
