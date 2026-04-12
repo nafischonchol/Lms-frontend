@@ -7,8 +7,6 @@ import {
   LayoutDashboard,
   Users,
   Tags,
-  Newspaper,
-  FolderOpen,
   ChevronDown,
   ChevronRight,
   X,
@@ -49,15 +47,6 @@ const menuConfig: MenuSection[] = [
           { title: "Users", href: "/admin/users/list" },
         ],
       },
-      {
-        title: "News",
-        icon: Newspaper,
-        subItems: [
-          { title: "News List", href: "/admin/news/list" },
-          { title: "Add News", href: "/admin/news/add" },
-        ],
-      },
-      { title: "Media Center", icon: FolderOpen, href: "/admin/media-center" },
     ],
   },
 ];

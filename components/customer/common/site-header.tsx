@@ -164,7 +164,7 @@ export function SiteHeader({ navLinks = defaultNavLinks }: { navLinks?: SiteNavL
             </button>
 
             <Link href="/" className="inline-flex items-center">
-              <Image src="/yeri-logo.jpg" alt="Shikkhapath" width={780} height={130} priority className="h-9 w-auto" />
+              <Image src="/yeri-logo.jpg" alt="Youth Revolution - Education & Research Institute (YRERI)" width={780} height={130} priority className="h-9 w-auto" />
             </Link>
 
             <button type="button" className="p-2 text-slate-700"><Search className="h-5 w-5" /></button>

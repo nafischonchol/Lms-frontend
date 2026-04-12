@@ -9,8 +9,8 @@ import { LmsHowItWorksSection } from "@/components/customer/home/lms-how-it-work
 import { LmsTestimonialsSection } from "@/components/customer/home/lms-testimonials-section"
 import { NewsletterSection } from "@/components/customer/home/newsletter-section"
 
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? "yreri"
-const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://shikkhapath.com"
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? "Youth Revolution - Education & Research Institute (YRERI)"
+const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://yreri.org"
 
 export const metadata: Metadata = {
   title: `${SITE_NAME} | বাংলাদেশের সেরা অনলাইন শিক্ষা প্ল্যাটফর্ম`,

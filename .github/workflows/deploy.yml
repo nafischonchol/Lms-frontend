@@ -19,11 +19,11 @@ jobs:
           port: 22
           script: |
             set -e
-            cd /projects/shikkhapath.com  # Apnar server-e project folder-er path
+            cd /projects/yreri  # Apnar server-e project folder-er path
             git reset --hard HEAD
             git config pull.rebase false
             git pull origin develop
             rm -rf .next node_modules
             npm ci
             npm run build
-            pm2 restart SHIKKHAPATH || pm2 start ecosystem.config.js # PM2-te je name deya ache.
+            pm2 restart yreri || pm2 start ecosystem.config.js # PM2-te je name deya ache.
