@@ -9,6 +9,7 @@ import { Button } from "@/components/admin/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
 import { Input } from "@/components/admin/ui/input";
 import { Label } from "@/components/admin/ui/label";
+import { RichTextEditor } from "@/components/admin/ui/rich-text-editor";
 import { Select } from "@/components/admin/ui/select";
 import { createCourseAction, updateCourseAction } from "@/lib/api/course-actions";
 
@@ -149,13 +150,10 @@ export function CourseForm({
           {/* Description */}
           <div className="space-y-1.5">
             <Label htmlFor="description">Description</Label>
-            <textarea
-              id="description"
+            <RichTextEditor
               value={form.description}
-              onChange={(e) => setField("description", e.target.value)}
+              onChange={(val) => setField("description", val)}
               placeholder="Course description"
-              rows={4}
-              className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
             />
           </div>
 
