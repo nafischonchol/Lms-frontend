@@ -23,9 +23,10 @@ type CategoryFormProps = {
   mode: "add" | "edit";
   categoryId?: string;
   initialValues?: Partial<CategoryFormValues>;
+  onSuccess?: () => void;
 };
 
-export function CategoryForm({ mode, categoryId, initialValues }: CategoryFormProps) {
+export function CategoryForm({ mode, categoryId, initialValues, onSuccess }: CategoryFormProps) {
   const router = useRouter();
   const [form, setForm] = useState<CategoryFormValues>({
     ...defaultValues,
@@ -68,10 +69,19 @@ export function CategoryForm({ mode, categoryId, initialValues }: CategoryFormPr
         }
 
         setSuccessMessage(result.message);
-        setTimeout(() => {
-          router.push("/admin/categories/list");
+        if (onSuccess) {
+          setForm({ ...defaultValues, ...initialValues });
           router.refresh();
-        }, 800);
+          setTimeout(() => {
+            setSuccessMessage("");
+            onSuccess();
+          }, 800);
+        } else {
+          setTimeout(() => {
+            router.push("/admin/categories/list");
+            router.refresh();
+          }, 800);
+        }
       }}
     >
       <div>
