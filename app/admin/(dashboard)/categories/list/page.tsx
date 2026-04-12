@@ -5,20 +5,14 @@ import { DeleteCategoryButton } from "@/components/admin/categories/DeleteCatego
 import { CategoryForm } from "@/components/admin/categories/CategoryForm";
 
 interface CategoriesListPageProps {
-  searchParams?: Promise<{
-    page?: string;
-    search?: string;
-  }>;
+  searchParams?: Promise<{ search?: string }>;
 }
 
-export default async function CategoriesListPage({
-  searchParams,
-}: CategoriesListPageProps) {
+export default async function CategoriesListPage({ searchParams }: CategoriesListPageProps) {
   const params = await searchParams;
-  const page = parseInt(params?.page || "1");
   const search = params?.search || "";
 
-  const { items: categories, pagination } = await getCategoriesList({ page, search });
+  const { items: categories } = await getCategoriesList({ search });
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 items-start">
