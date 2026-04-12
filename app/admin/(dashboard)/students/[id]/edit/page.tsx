@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { List } from "lucide-react";
+import { Eye, List } from "lucide-react";
 
 import { StudentForm } from "@/components/admin/students/StudentForm";
 import { Button } from "@/components/admin/ui/button";
@@ -29,12 +29,20 @@ export default async function EditStudentPage({
           { label: "Edit" },
         ]}
         action={(
-          <Link href="/admin/students/list">
-            <Button variant="secondary">
-              <List size={16} />
-              Student List
-            </Button>
-          </Link>
+          <>
+            <Link href="/admin/students/list">
+              <Button variant="secondary">
+                <List size={16} />
+                Student List
+              </Button>
+            </Link>
+            <Link href={`/admin/students/${id}`}>
+              <Button variant="secondary">
+                <Eye size={16} />
+                View Details
+              </Button>
+            </Link>
+          </>
         )}
       />
 

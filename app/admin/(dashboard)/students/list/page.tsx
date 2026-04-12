@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Pencil } from "lucide-react";
+import { Eye, Plus, Pencil } from "lucide-react";
 
 import { Button } from "@/components/admin/ui/button";
 import { Card, CardContent } from "@/components/admin/ui/card";
@@ -87,6 +87,12 @@ export default async function StudentsListPage({
                     <td className="px-6 py-4 text-slate-600">{formatBoolean(student.is_active, "Active", "Inactive")}</td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        <Link href={`/admin/students/${student.id}`}>
+                          <Button variant="secondary" size="sm">
+                            <Eye size={14} />
+                            Details
+                          </Button>
+                        </Link>
                         <StudentStatusToggleButton studentId={student.id} isActive={student.is_active} />
                         <Link href={`/admin/students/${student.id}/edit`}>
                           <Button variant="secondary" size="sm">

@@ -7,6 +7,25 @@ export type StudentApiModel = {
   name: string;
   email: string;
   is_active: boolean;
+  enrolled_courses_count?: number;
+  completed_courses_count?: number;
+  enrollments?: StudentEnrollmentApiModel[];
+};
+
+export type StudentEnrollmentApiModel = {
+  id: number;
+  student_id: number;
+  course_id: number;
+  fee: string | null;
+  enrolled_at: string | null;
+  completed_at: string | null;
+  course: {
+    id: number;
+    title: string;
+    thumbnail: string | null;
+    level: string | null;
+    status: string | null;
+  } | null;
 };
 
 export type GetStudentsParams = {
@@ -43,10 +62,41 @@ function asBoolean(value: unknown, fallback = false): boolean {
   return fallback;
 }
 
+function asStringOrNull(value: unknown): string | null {
+  if (typeof value === "string" && value.trim()) return value;
+  if (typeof value === "number") return String(value);
+  return null;
+}
+
 function getMessage(payload: unknown, fallback: string): string {
   const root = asObject(payload);
   const message = root.message;
   return typeof message === "string" && message.trim() ? message : fallback;
+}
+
+function normalizeEnrollment(value: unknown): StudentEnrollmentApiModel {
+  const item = asObject(value);
+  const courseRaw = item.course;
+  const course =
+    courseRaw && typeof courseRaw === "object" && !Array.isArray(courseRaw)
+      ? {
+          id: Number((courseRaw as Record<string, unknown>).id),
+          title: asString((courseRaw as Record<string, unknown>).title),
+          thumbnail: asStringOrNull((courseRaw as Record<string, unknown>).thumbnail),
+          level: asStringOrNull((courseRaw as Record<string, unknown>).level),
+          status: asStringOrNull((courseRaw as Record<string, unknown>).status),
+        }
+      : null;
+
+  return {
+    id: Number(item.id),
+    student_id: Number(item.student_id),
+    course_id: Number(item.course_id),
+    fee: asStringOrNull(item.fee),
+    enrolled_at: asStringOrNull(item.enrolled_at),
+    completed_at: asStringOrNull(item.completed_at),
+    course,
+  };
 }
 
 function normalizeStudent(value: unknown): StudentApiModel {
@@ -57,6 +107,13 @@ function normalizeStudent(value: unknown): StudentApiModel {
     name: asString(item.name),
     email: asString(item.email),
     is_active: asBoolean(item.is_active, true),
+    enrolled_courses_count:
+      item.enrolled_courses_count !== undefined ? Number(item.enrolled_courses_count) : undefined,
+    completed_courses_count:
+      item.completed_courses_count !== undefined ? Number(item.completed_courses_count) : undefined,
+    enrollments: Array.isArray(item.enrollments)
+      ? item.enrollments.map(normalizeEnrollment)
+      : undefined,
   };
 }
 
