@@ -43,6 +43,7 @@ const menuConfig: MenuSection[] = [
         title: "User Manage",
         icon: Users,
         subItems: [
+          { title: "Teachers", href: "/admin/teachers/list" },
           { title: "Roles", href: "/admin/roles/list" },
           { title: "Users", href: "/admin/users/list" },
         ],
