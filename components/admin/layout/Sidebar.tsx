@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
-  UserCircle,
   Users,
   Tags,
   Newspaper,
@@ -32,14 +31,12 @@ const menuConfig: MenuSection[] = [
     title: "Main",
     items: [
       { title: "Dashboard", icon: LayoutDashboard, href: "/admin" },
-      { title: "Members", icon: UserCircle, href: "/admin/members/list" },
       {
         title: "Categories",
         icon: Tags,
         subItems: [
           { title: "Category List", href: "/admin/categories/list" },
           { title: "Add Category", href: "/admin/categories/add" },
-          { title: "Home Page Categories", href: "/admin/categories/homepage" },
         ],
       },
       {
