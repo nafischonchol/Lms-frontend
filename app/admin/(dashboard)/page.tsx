@@ -13,7 +13,6 @@ import {
   CircleCheck,
 } from "lucide-react";
 
-import { Button } from "@/components/admin/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/admin/ui/card";
 import { PageHeader } from "@/components/admin/ui/page-header";
 
@@ -227,16 +226,6 @@ export default async function Home() {
       <PageHeader
         title="Dashboard Overview"
         breadcrumbs={[{ label: "Home", href: "/" }, { label: "Dashboard" }]}
-        action={(
-          <div className="flex items-center gap-2">
-            <Link href="/admin/projects/add">
-              <Button size="sm">Add Project</Button>
-            </Link>
-            <Link href="/admin/services/add">
-              <Button size="sm" variant="secondary">Add Service</Button>
-            </Link>
-          </div>
-        )}
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
