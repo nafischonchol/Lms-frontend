@@ -9,7 +9,7 @@ import { LmsHowItWorksSection } from "@/components/customer/home/lms-how-it-work
 import { LmsTestimonialsSection } from "@/components/customer/home/lms-testimonials-section"
 import { NewsletterSection } from "@/components/customer/home/newsletter-section"
 
-const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? "শিক্ষাপথ"
+const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? "yreri"
 const SITE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://shikkhapath.com"
 
 export const metadata: Metadata = {

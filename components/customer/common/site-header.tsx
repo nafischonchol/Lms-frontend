@@ -129,48 +129,7 @@ export function SiteHeader({ navLinks = defaultNavLinks }: { navLinks?: SiteNavL
             isCompact ? "max-h-0 opacity-0 transform -translate-y-2" : "max-h-24 opacity-100 transform translate-y-0"
           }`}
         >
-          <div className="mx-auto flex w-full max-w-screen-2xl items-center justify-between px-4 py-4 lg:px-6">
-            <Link href="/" className="inline-flex items-center transition-opacity hover:opacity-90">
-              <Image
-                src="/logo.png"
-                alt="Shikkhapath"
-                width={780}
-                height={130}
-                priority
-                className="h-[56px] w-auto drop-shadow-sm"
-              />
-            </Link>
-
-            <div className="flex items-center gap-8 text-sm text-slate-700">
-              <span className="font-semibold text-slate-500">{currentDate || "লোড হচ্ছে..."}</span>
-              <div className="flex items-center gap-4 bg-slate-50 rounded-full px-5 py-2 ring-1 ring-slate-100">
-                <button 
-                  onClick={() => setIsSearchOpen(!isSearchOpen)}
-                  type="button" 
-                  className={`transition-colors ${isSearchOpen ? "text-[#b38716]" : "text-slate-600 hover:text-[#b38716]"}`}
-                  aria-label="Search"
-                >
-                  <Search className="h-5 w-5" />
-                </button>
-                <div className="w-px h-4 bg-slate-200" />
-                <button 
-                  onClick={toggleTheme}
-                  type="button" 
-                  className="text-slate-600 hover:text-[#b38716] transition-transform active:scale-90" 
-                  aria-label="Toggle theme"
-                >
-                  {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5 text-amber-500" />}
-                </button>
-                <button 
-                  onClick={toggleLanguage}
-                  type="button" 
-                  className="inline-flex items-center gap-2 text-[13px] font-bold text-slate-700 hover:text-[#b38716] transition-all"
-                >
-                  <Globe className="h-4 w-4" /> {language === "bn" ? "Eng" : "বাংলা"}
-                </button>
-              </div>
-            </div>
-          </div>
+         
         </div>
 
         {/* Sliding Search Overlay */}
@@ -205,7 +164,7 @@ export function SiteHeader({ navLinks = defaultNavLinks }: { navLinks?: SiteNavL
             </button>
 
             <Link href="/" className="inline-flex items-center">
-              <Image src="/logo.png" alt="Shikkhapath" width={780} height={130} priority className="h-9 w-auto" />
+              <Image src="/yeri-logo.jpg" alt="Shikkhapath" width={780} height={130} priority className="h-9 w-auto" />
             </Link>
 
             <button type="button" className="p-2 text-slate-700"><Search className="h-5 w-5" /></button>
@@ -219,7 +178,7 @@ export function SiteHeader({ navLinks = defaultNavLinks }: { navLinks?: SiteNavL
             {/* Sticky Logo - Absolute Positioned to prevent layout jump */}
             <div className={`absolute left-4 lg:left-6 transition-all duration-300 flex items-center ${isCompact ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-5 pointer-events-none"}`}>
               <Link href="/" className="inline-flex shrink-0 items-center">
-                <Image src="/logo.png" alt="Logo" width={780} height={130} className="h-8 w-auto" />
+                <Image src="/yeri-logo.jpg" alt="Logo" width={780} height={130} className="h-8 w-auto" />
               </Link>
             </div>
 
@@ -254,7 +213,7 @@ export function SiteHeader({ navLinks = defaultNavLinks }: { navLinks?: SiteNavL
           <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
           <div className="relative h-full w-[85%] max-w-sm bg-white shadow-2xl transition-all duration-300">
             <div className="flex items-center justify-between border-b px-5 py-5 bg-white sticky top-0">
-              <Link href="/" onClick={() => setIsOpen(false)}><Image src="/logo.png" alt="Logo" width={780} height={130} className="h-9 w-auto" /></Link>
+              <Link href="/" onClick={() => setIsOpen(false)}><Image src="/yeri-logo.jpg" alt="Logo" width={780} height={130} className="h-9 w-auto" /></Link>
               <button onClick={() => setIsOpen(false)} className="rounded-full bg-slate-100 p-2"><X className="h-6 w-6" /></button>
             </div>
             <nav className="p-6 space-y-2">
