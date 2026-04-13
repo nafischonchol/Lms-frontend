@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 
 import { LmsHeroSection } from "@/components/customer/home/lms-hero-section"
 import { LmsFeaturesSection } from "@/components/customer/home/lms-features-section"
+import { FeaturedCoursesSection } from "@/components/customer/home/featured-courses-section"
 import { LmsHowItWorksSection } from "@/components/customer/home/lms-how-it-works-section"
 import { NewsletterSection } from "@/components/customer/home/newsletter-section"
 
@@ -42,6 +43,7 @@ export default function Home() {
 
       <main className="mx-auto w-full max-w-screen-2xl px-3 sm:px-4 lg:px-5">
         <LmsFeaturesSection />
+        <FeaturedCoursesSection />
         <LmsHowItWorksSection />
         <NewsletterSection />
       </main>
