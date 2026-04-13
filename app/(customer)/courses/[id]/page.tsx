@@ -16,6 +16,7 @@ import {
   Smartphone,
 } from "lucide-react"
 import { allCourses } from "@/components/customer/courses/course-data"
+import { courseDetailsData, defaultCourseDetails } from "@/components/customer/courses/course-details-data"
 import type { Course } from "@/components/customer/courses/course-card"
 import type { Metadata } from "next"
 
@@ -37,26 +38,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-const curriculumData: Record<string, { section: string; lessons: string[] }[]> = {
-  default: [
-    {
-      section: "পরিচিতি ও সেটআপ",
-      lessons: ["কোর্স পরিচিতি", "পরিবেশ সেটআপ", "প্রথম প্রোগ্রাম লেখা"],
-    },
-    {
-      section: "মূল ধারণাসমূহ",
-      lessons: ["মৌলিক সিনট্যাক্স", "ভেরিয়েবল ও ডেটা টাইপ", "কন্ডিশনাল লজিক", "লুপ ও ইটারেশন"],
-    },
-    {
-      section: "মধ্যবর্তী বিষয়",
-      lessons: ["ফাংশন ও মডুলারিটি", "অবজেক্ট-ওরিয়েন্টেড প্রোগ্রামিং", "এরর হ্যান্ডলিং", "ফাইল ও ডেটা"],
-    },
-    {
-      section: "প্রজেক্ট ও অনুশীলন",
-      lessons: ["ছোট প্রজেক্ট বিল্ড", "কোড রিভিউ", "ফাইনাল প্রজেক্ট"],
-    },
-  ],
-}
 
 function StarRating({ rating, size = "md" }: { rating: number; size?: "sm" | "md" | "lg" }) {
   const sizes = { sm: "text-sm", md: "text-base", lg: "text-xl" }
@@ -78,17 +59,9 @@ export default async function CourseDetailPage({ params }: Props) {
 
   if (!course) notFound()
 
-  const curriculum = curriculumData[id] ?? curriculumData["default"]
+  const details = courseDetailsData[id] ?? defaultCourseDetails
+  const { curriculum, whatYouLearn, instructorBio } = details
   const totalLessons = curriculum.reduce((acc, s) => acc + s.lessons.length, 0)
-
-  const whatYouLearn = [
-    "শূন্য থেকে শুরু করে দক্ষতা অর্জন করুন",
-    "বাস্তব প্রজেক্ট তৈরি করে শিখুন",
-    "ইন্ডাস্ট্রি-স্ট্যান্ডার্ড কৌশল ও টুলস ব্যবহার করুন",
-    "সার্টিফিকেট অর্জন করুন",
-    "লাইফটাইম অ্যাক্সেস পাবেন",
-    "কমিউনিটি সাপোর্ট ও মেন্টরশিপ পাবেন",
-  ]
 
   return (
     <main>
@@ -292,7 +265,7 @@ export default async function CourseDetailPage({ params }: Props) {
                     </span>
                   </div>
                   <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                    {course.instructor} একজন অভিজ্ঞ {course.category} বিশেষজ্ঞ এবং শিক্ষক। তিনি বাস্তব অভিজ্ঞতার আলোকে শিক্ষার্থীদের দক্ষতা বৃদ্ধিতে সাহায্য করেন।
+                    {instructorBio}
                   </p>
                 </div>
               </div>
