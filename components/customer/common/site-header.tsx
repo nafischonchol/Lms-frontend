@@ -162,7 +162,7 @@ export function SiteHeader({
                 })}
               </nav>
               <Link
-                href="/register"
+                href="/login"
                 className="ml-2 inline-flex items-center rounded-2xl bg-indigo-600 px-5 py-2.5 text-[15px] font-bold text-white shadow transition-all hover:bg-indigo-700 active:scale-95"
               >
                 লগইন
@@ -215,7 +215,14 @@ export function SiteHeader({
                 </Link>
               ))}
             </nav>
-            <div className="px-6 mt-10">
+            <div className="px-6 mt-10 space-y-3">
+              <Link
+                href="/login"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-center rounded-2xl bg-white border border-slate-200 py-4.5 text-slate-900 font-bold shadow-sm transition-all hover:bg-slate-50"
+              >
+                লগইন
+              </Link>
               <Link
                 href="/register"
                 onClick={() => setIsOpen(false)}
