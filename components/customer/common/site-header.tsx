@@ -13,9 +13,9 @@ export type SiteNavLink = {
 
 const defaultNavLinks: SiteNavLink[] = [
   { label: "হোম", href: "/" },
-  { label: "কোর্সসমূহ", href: "/courses", hasDropdown: true },
-  { label: "লাইভ ক্লাস", href: "/courses/live" },
-  { label: "ক্যাটাগরি", href: "/courses/categories", hasDropdown: true },
+  { label: "কোর্সসমূহ", href: "/courses"},
+  // { label: "লাইভ ক্লাস", href: "/courses/live" },
+  // { label: "ক্যাটাগরি", href: "/courses/categories", hasDropdown: true },
   { label: "শিক্ষকমণ্ডলী", href: "/instructors" },
   { label: "আমাদের সম্পর্কে", href: "/about" },
   { label: "যোগাযোগ", href: "/contact-us" },
