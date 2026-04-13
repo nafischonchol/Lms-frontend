@@ -222,7 +222,6 @@ export const allCourses: Course[] = [
     levelColor: "bg-green-100 text-green-700",
     price: "৳ ৫৯৯",
     originalPrice: "৳ ১,১৯৯",
-    isFree: false,
   },
 ]
 

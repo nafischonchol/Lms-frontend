@@ -34,8 +34,10 @@ export default function CoursesPage() {
     .sort((a, b) => {
       if (sortBy === "rating") return b.rating - a.rating
       if (sortBy === "price-asc") {
-        const priceA = parseInt(a.price.replace(/\D/g, ""), 10)
-        const priceB = parseInt(b.price.replace(/\D/g, ""), 10)
+        const toBengaliDigit = (str: string) =>
+          str.replace(/[০-৯]/g, (d) => String("০১২৩৪৫৬৭৮৯".indexOf(d)))
+        const priceA = parseInt(toBengaliDigit(a.price).replace(/\D/g, ""), 10)
+        const priceB = parseInt(toBengaliDigit(b.price).replace(/\D/g, ""), 10)
         return priceA - priceB
       }
       if (sortBy === "newest") return (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0)
