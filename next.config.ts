@@ -12,6 +12,12 @@ module.exports = {
         protocol: 'https',
         hostname: 'picsum.photos',
       },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '8000',
+        pathname: '/storage/**',
+      },
     ],
   },
 }

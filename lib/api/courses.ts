@@ -15,6 +15,7 @@ export type CourseApiModel = {
   level: "beginner" | "intermediate" | "advanced" | null;
   status: "draft" | "published" | "archived";
   is_active: boolean;
+  lessons_count?: number;
   enrollments_count?: number;
   enrollments?: CourseEnrollmentApiModel[];
   instructor?: { id: number; name: string } | null;
@@ -158,6 +159,8 @@ function normalizeCourse(value: unknown): CourseApiModel {
     level,
     status,
     is_active: asBoolean(item.is_active, true),
+    lessons_count:
+      item.lessons_count !== undefined ? Number(item.lessons_count) : undefined,
     enrollments_count:
       item.enrollments_count !== undefined ? Number(item.enrollments_count) : undefined,
     enrollments: Array.isArray(item.enrollments)
@@ -251,5 +254,50 @@ export async function getCourseById(courseId: number): Promise<CourseApiModel | 
   } catch (error) {
     console.error(`Failed to fetch course ${courseId}:`, error);
     return null;
+  }
+}
+
+export async function getPublicCoursesList(params?: GetCoursesParams): Promise<CoursesListResult> {
+  const fallbackPage = params?.page ?? 1;
+  const fallbackPerPage = params?.per_page ?? 15;
+
+  try {
+    const query = new URLSearchParams();
+
+    if (params?.page !== undefined) query.set("page", String(params.page));
+    if (params?.per_page !== undefined) query.set("per_page", String(params.per_page));
+    if (params?.search?.trim()) query.set("search", params.search.trim());
+    if (params?.is_active !== undefined) query.set("is_active", params.is_active);
+    if (params?.status) query.set("status", params.status);
+    if (params?.category_id) query.set("category_id", params.category_id);
+    if (params?.instructor_id) query.set("instructor_id", params.instructor_id);
+
+    // Public API prefix is not /api/ in this project's configuration
+    const path = query.toString() ? `/courses?${query.toString()}` : "/courses";
+
+    // Public API doesn't need admin token
+    const response = await fetchApi(path, {}, { includeAuth: false });
+
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new Error(getMessage(payload, "Failed to load courses."));
+    }
+
+    return {
+      items: extractList(payload).map(normalizeCourse),
+      pagination: extractPagination(payload, fallbackPage, fallbackPerPage),
+    };
+  } catch (error) {
+    console.error("Failed to fetch public courses:", error);
+    return {
+      items: [],
+      pagination: {
+        currentPage: fallbackPage,
+        lastPage: fallbackPage,
+        perPage: fallbackPerPage,
+        total: 0,
+      },
+    };
   }
 }
