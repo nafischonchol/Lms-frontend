@@ -101,21 +101,12 @@ export function extractPagination(
   fallbackPage: number,
   fallbackPerPage: number,
 ): BasePagination {
-  const pagination = payload?.pagination ?? payload?.meta?.pagination ?? payload?.meta ?? payload;
+  const pagination = payload?.pagination ?? [];
 
   return {
-    currentPage: Math.max(
-      1,
-      Number(pagination?.current_page ?? pagination?.currentPage ?? fallbackPage) || fallbackPage,
-    ),
-    lastPage: Math.max(
-      1,
-      Number(pagination?.last_page ?? pagination?.lastPage ?? fallbackPage) || fallbackPage,
-    ),
-    perPage: Math.max(
-      1,
-      Number(pagination?.per_page ?? pagination?.perPage ?? fallbackPerPage) || fallbackPerPage,
-    ),
-    total: Math.max(0, Number(pagination?.total ?? 0) || 0),
+    currentPage: Math.max(1, Number(pagination?.current_page) || fallbackPage),
+    lastPage: Math.max(1, Number(pagination?.last_page) || fallbackPage),
+    perPage: Math.max(1, Number(pagination?.per_page) || fallbackPerPage),
+    total: Math.max(0, Number(pagination?.total) || 0),
   };
 }

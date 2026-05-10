@@ -55,7 +55,9 @@ export type CoursesListResult = {
 };
 
 function asObject(value: unknown): Record<string, unknown> {
-  return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  return value && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : {};
 }
 
 function asString(value: unknown, fallback = ""): string {
@@ -96,7 +98,10 @@ function normalizeEnrollment(value: unknown): CourseEnrollmentApiModel {
           id: Number((studentRaw as Record<string, unknown>).id),
           name: asString((studentRaw as Record<string, unknown>).name),
           email: asString((studentRaw as Record<string, unknown>).email),
-          is_active: asBoolean((studentRaw as Record<string, unknown>).is_active, true),
+          is_active: asBoolean(
+            (studentRaw as Record<string, unknown>).is_active,
+            true,
+          ),
         }
       : null;
 
@@ -116,7 +121,9 @@ function normalizeCourse(value: unknown): CourseApiModel {
 
   const instructorRaw = item.instructor;
   const instructor =
-    instructorRaw && typeof instructorRaw === "object" && !Array.isArray(instructorRaw)
+    instructorRaw &&
+    typeof instructorRaw === "object" &&
+    !Array.isArray(instructorRaw)
       ? {
           id: Number((instructorRaw as Record<string, unknown>).id),
           name: asString((instructorRaw as Record<string, unknown>).name),
@@ -125,7 +132,9 @@ function normalizeCourse(value: unknown): CourseApiModel {
 
   const categoryRaw = item.category;
   const category =
-    categoryRaw && typeof categoryRaw === "object" && !Array.isArray(categoryRaw)
+    categoryRaw &&
+    typeof categoryRaw === "object" &&
+    !Array.isArray(categoryRaw)
       ? {
           id: Number((categoryRaw as Record<string, unknown>).id),
           name: asString((categoryRaw as Record<string, unknown>).name),
@@ -138,7 +147,9 @@ function normalizeCourse(value: unknown): CourseApiModel {
 
   const rawLevel = asString(item.level);
   const level: CourseApiModel["level"] =
-    rawLevel === "beginner" || rawLevel === "intermediate" || rawLevel === "advanced"
+    rawLevel === "beginner" ||
+    rawLevel === "intermediate" ||
+    rawLevel === "advanced"
       ? rawLevel
       : null;
 
@@ -148,7 +159,8 @@ function normalizeCourse(value: unknown): CourseApiModel {
 
   return {
     id: Number(item.id),
-    instructor_id: item.instructor_id != null ? Number(item.instructor_id) : null,
+    instructor_id:
+      item.instructor_id != null ? Number(item.instructor_id) : null,
     category_id: item.category_id != null ? Number(item.category_id) : null,
     title: asString(item.title),
     description: asStringOrNull(item.description),
@@ -162,7 +174,9 @@ function normalizeCourse(value: unknown): CourseApiModel {
     lessons_count:
       item.lessons_count !== undefined ? Number(item.lessons_count) : undefined,
     enrollments_count:
-      item.enrollments_count !== undefined ? Number(item.enrollments_count) : undefined,
+      item.enrollments_count !== undefined
+        ? Number(item.enrollments_count)
+        : undefined,
     enrollments: Array.isArray(item.enrollments)
       ? item.enrollments.map(normalizeEnrollment)
       : undefined,
@@ -196,7 +210,9 @@ function extractOne(payload: unknown): unknown | null {
   return null;
 }
 
-export async function getCoursesList(params?: GetCoursesParams): Promise<CoursesListResult> {
+export async function getCoursesList(
+  params?: GetCoursesParams,
+): Promise<CoursesListResult> {
   const fallbackPage = params?.page ?? 1;
   const fallbackPerPage = params?.per_page ?? 15;
 
@@ -204,14 +220,18 @@ export async function getCoursesList(params?: GetCoursesParams): Promise<Courses
     const query = new URLSearchParams();
 
     if (params?.page !== undefined) query.set("page", String(params.page));
-    if (params?.per_page !== undefined) query.set("per_page", String(params.per_page));
+    if (params?.per_page !== undefined)
+      query.set("per_page", String(params.per_page));
     if (params?.search?.trim()) query.set("search", params.search.trim());
-    if (params?.is_active !== undefined) query.set("is_active", params.is_active);
+    if (params?.is_active !== undefined)
+      query.set("is_active", params.is_active);
     if (params?.status) query.set("status", params.status);
     if (params?.category_id) query.set("category_id", params.category_id);
     if (params?.instructor_id) query.set("instructor_id", params.instructor_id);
 
-    const path = query.toString() ? `/admin/courses?${query.toString()}` : "/admin/courses";
+    const path = query.toString()
+      ? `/admin/courses?${query.toString()}`
+      : "/admin/courses";
 
     const response = await fetchApi(path);
     const payload = await response.json().catch(() => null);
@@ -221,7 +241,7 @@ export async function getCoursesList(params?: GetCoursesParams): Promise<Courses
     }
 
     return {
-      items: extractList(payload).map(normalizeCourse),
+      items: payload.resources.map(normalizeCourse),
       pagination: extractPagination(payload, fallbackPage, fallbackPerPage),
     };
   } catch (error) {
@@ -238,7 +258,9 @@ export async function getCoursesList(params?: GetCoursesParams): Promise<Courses
   }
 }
 
-export async function getCourseById(courseId: number): Promise<CourseApiModel | null> {
+export async function getCourseById(
+  courseId: number,
+): Promise<CourseApiModel | null> {
   try {
     const response = await fetchApi(`/admin/courses/${courseId}`);
     const payload = await response.json().catch(() => null);
@@ -257,7 +279,9 @@ export async function getCourseById(courseId: number): Promise<CourseApiModel | 
   }
 }
 
-export async function getPublicCoursesList(params?: GetCoursesParams): Promise<CoursesListResult> {
+export async function getPublicCoursesList(
+  params?: GetCoursesParams,
+): Promise<CoursesListResult> {
   const fallbackPage = params?.page ?? 1;
   const fallbackPerPage = params?.per_page ?? 15;
 
@@ -265,9 +289,11 @@ export async function getPublicCoursesList(params?: GetCoursesParams): Promise<C
     const query = new URLSearchParams();
 
     if (params?.page !== undefined) query.set("page", String(params.page));
-    if (params?.per_page !== undefined) query.set("per_page", String(params.per_page));
+    if (params?.per_page !== undefined)
+      query.set("per_page", String(params.per_page));
     if (params?.search?.trim()) query.set("search", params.search.trim());
-    if (params?.is_active !== undefined) query.set("is_active", params.is_active);
+    if (params?.is_active !== undefined)
+      query.set("is_active", params.is_active);
     if (params?.status) query.set("status", params.status);
     if (params?.category_id) query.set("category_id", params.category_id);
     if (params?.instructor_id) query.set("instructor_id", params.instructor_id);
