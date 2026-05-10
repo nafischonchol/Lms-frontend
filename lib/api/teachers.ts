@@ -22,7 +22,9 @@ export type TeachersListResult = {
 };
 
 function asObject(value: unknown): Record<string, unknown> {
-  return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  return value && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : {};
 }
 
 function asString(value: unknown, fallback = ""): string {
@@ -67,7 +69,14 @@ function extractList(payload: unknown): unknown[] {
   if (Array.isArray(root.resources)) return root.resources;
 
   const resources = asObject(root.resources);
-  const candidates = [root.data, root.teachers, resources.teachers, resources.data, resources.items, resources];
+  const candidates = [
+    root.data,
+    root.teachers,
+    resources.teachers,
+    resources.data,
+    resources.items,
+    resources,
+  ];
 
   for (const candidate of candidates) {
     if (Array.isArray(candidate)) {
@@ -86,10 +95,21 @@ function extractOne(payload: unknown): unknown | null {
 
   const root = asObject(payload);
   const resources = asObject(root.resources);
-  const candidates = [root.teacher, root.data, resources.teacher, resources.data, resources.item, resources];
+  const candidates = [
+    root.teacher,
+    root.data,
+    resources.teacher,
+    resources.data,
+    resources.item,
+    resources,
+  ];
 
   for (const candidate of candidates) {
-    if (candidate && typeof candidate === "object" && !Array.isArray(candidate)) {
+    if (
+      candidate &&
+      typeof candidate === "object" &&
+      !Array.isArray(candidate)
+    ) {
       return candidate;
     }
   }
@@ -97,7 +117,9 @@ function extractOne(payload: unknown): unknown | null {
   return null;
 }
 
-export async function getTeachersList(params?: GetTeachersParams): Promise<TeachersListResult> {
+export async function getTeachersList(
+  params?: GetTeachersParams,
+): Promise<TeachersListResult> {
   const fallbackPage = params?.page ?? 1;
   const fallbackPerPage = params?.per_page ?? 20;
 
@@ -120,7 +142,9 @@ export async function getTeachersList(params?: GetTeachersParams): Promise<Teach
       query.set("is_active", params.is_active);
     }
 
-    const path = query.toString() ? `/admin/teachers?${query.toString()}` : "/admin/teachers";
+    const path = query.toString()
+      ? `/admin/teachers?${query.toString()}`
+      : "/admin/teachers";
 
     const response = await fetchApi(path);
     const payload = await response.json().catch(() => null);
@@ -130,7 +154,7 @@ export async function getTeachersList(params?: GetTeachersParams): Promise<Teach
     }
 
     return {
-      items: extractList(payload).map(normalizeTeacher),
+      items: payload?.resources ?? [],
       pagination: extractPagination(payload, fallbackPage, fallbackPerPage),
     };
   } catch (error) {
@@ -147,7 +171,9 @@ export async function getTeachersList(params?: GetTeachersParams): Promise<Teach
   }
 }
 
-export async function getTeacherById(teacherId: string): Promise<TeacherApiModel | null> {
+export async function getTeacherById(
+  teacherId: string,
+): Promise<TeacherApiModel | null> {
   try {
     const response = await fetchApi(`/admin/teachers/${teacherId}`);
     const payload = await response.json().catch(() => null);

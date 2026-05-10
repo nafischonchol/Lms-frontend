@@ -41,7 +41,9 @@ export type StudentsListResult = {
 };
 
 function asObject(value: unknown): Record<string, unknown> {
-  return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  return value && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : {};
 }
 
 function asString(value: unknown, fallback = ""): string {
@@ -82,7 +84,9 @@ function normalizeEnrollment(value: unknown): StudentEnrollmentApiModel {
       ? {
           id: Number((courseRaw as Record<string, unknown>).id),
           title: asString((courseRaw as Record<string, unknown>).title),
-          thumbnail: asStringOrNull((courseRaw as Record<string, unknown>).thumbnail),
+          thumbnail: asStringOrNull(
+            (courseRaw as Record<string, unknown>).thumbnail,
+          ),
           level: asStringOrNull((courseRaw as Record<string, unknown>).level),
           status: asStringOrNull((courseRaw as Record<string, unknown>).status),
         }
@@ -108,9 +112,13 @@ function normalizeStudent(value: unknown): StudentApiModel {
     email: asString(item.email),
     is_active: asBoolean(item.is_active, true),
     enrolled_courses_count:
-      item.enrolled_courses_count !== undefined ? Number(item.enrolled_courses_count) : undefined,
+      item.enrolled_courses_count !== undefined
+        ? Number(item.enrolled_courses_count)
+        : undefined,
     completed_courses_count:
-      item.completed_courses_count !== undefined ? Number(item.completed_courses_count) : undefined,
+      item.completed_courses_count !== undefined
+        ? Number(item.completed_courses_count)
+        : undefined,
     enrollments: Array.isArray(item.enrollments)
       ? item.enrollments.map(normalizeEnrollment)
       : undefined,
@@ -118,20 +126,8 @@ function normalizeStudent(value: unknown): StudentApiModel {
 }
 
 function extractList(payload: unknown): unknown[] {
-  if (Array.isArray(payload)) return payload;
-
   const root = asObject(payload);
   if (Array.isArray(root.resources)) return root.resources;
-
-  const resources = asObject(root.resources);
-  const candidates = [root.data, root.students, resources.students, resources.data, resources.items, resources];
-
-  for (const candidate of candidates) {
-    if (Array.isArray(candidate)) {
-      return candidate;
-    }
-  }
-
   return [];
 }
 
@@ -143,10 +139,21 @@ function extractOne(payload: unknown): unknown | null {
 
   const root = asObject(payload);
   const resources = asObject(root.resources);
-  const candidates = [root.student, root.data, resources.student, resources.data, resources.item, resources];
+  const candidates = [
+    root.student,
+    root.data,
+    resources.student,
+    resources.data,
+    resources.item,
+    resources,
+  ];
 
   for (const candidate of candidates) {
-    if (candidate && typeof candidate === "object" && !Array.isArray(candidate)) {
+    if (
+      candidate &&
+      typeof candidate === "object" &&
+      !Array.isArray(candidate)
+    ) {
       return candidate;
     }
   }
@@ -154,7 +161,9 @@ function extractOne(payload: unknown): unknown | null {
   return null;
 }
 
-export async function getStudentsList(params?: GetStudentsParams): Promise<StudentsListResult> {
+export async function getStudentsList(
+  params?: GetStudentsParams,
+): Promise<StudentsListResult> {
   const fallbackPage = params?.page ?? 1;
   const fallbackPerPage = params?.per_page ?? 20;
 
@@ -177,7 +186,9 @@ export async function getStudentsList(params?: GetStudentsParams): Promise<Stude
       query.set("is_active", params.is_active);
     }
 
-    const path = query.toString() ? `/admin/students?${query.toString()}` : "/admin/students";
+    const path = query.toString()
+      ? `/admin/students?${query.toString()}`
+      : "/admin/students";
 
     const response = await fetchApi(path);
     const payload = await response.json().catch(() => null);
@@ -204,7 +215,9 @@ export async function getStudentsList(params?: GetStudentsParams): Promise<Stude
   }
 }
 
-export async function getStudentById(studentId: string): Promise<StudentApiModel | null> {
+export async function getStudentById(
+  studentId: string,
+): Promise<StudentApiModel | null> {
   try {
     const response = await fetchApi(`/admin/students/${studentId}`);
     const payload = await response.json().catch(() => null);

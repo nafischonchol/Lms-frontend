@@ -22,7 +22,9 @@ export type CategoriesListResult = {
 };
 
 function asObject(value: unknown): Record<string, unknown> {
-  return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  return value && typeof value === "object"
+    ? (value as Record<string, unknown>)
+    : {};
 }
 
 function asString(value: unknown, fallback = ""): string {
@@ -55,7 +57,8 @@ function normalizeCategory(value: unknown): Category {
     name: asString(item.name),
     description: asString(item.description) || null,
     is_active: asBoolean(item.is_active, true),
-    courses_count: item.courses_count !== undefined ? Number(item.courses_count) : undefined,
+    courses_count:
+      item.courses_count !== undefined ? Number(item.courses_count) : undefined,
     created_at: asString(item.created_at),
     updated_at: asString(item.updated_at),
   };
@@ -80,13 +83,18 @@ function extractOne(payload: unknown): unknown | null {
   return null;
 }
 
-export async function getCategoriesList(params?: GetCategoriesParams): Promise<CategoriesListResult> {
+export async function getCategoriesList(
+  params?: GetCategoriesParams,
+): Promise<CategoriesListResult> {
   try {
     const query = new URLSearchParams();
     if (params?.search?.trim()) query.set("search", params.search.trim());
-    if (params?.is_active !== undefined) query.set("is_active", String(params.is_active));
+    if (params?.is_active !== undefined)
+      query.set("is_active", String(params.is_active));
 
-    const path = query.toString() ? `/admin/categories?${query.toString()}` : "/admin/categories";
+    const path = query.toString()
+      ? `/admin/categories?${query.toString()}`
+      : "/admin/categories";
     const response = await fetchApi(path);
     const payload = await response.json().catch(() => null);
 
@@ -95,7 +103,7 @@ export async function getCategoriesList(params?: GetCategoriesParams): Promise<C
     }
 
     return {
-      items: extractList(payload).map(normalizeCategory),
+      items: payload?.resources || [],
     };
   } catch (error) {
     console.error("Failed to fetch categories:", error);
@@ -103,13 +111,16 @@ export async function getCategoriesList(params?: GetCategoriesParams): Promise<C
   }
 }
 
-export async function getCategoryById(categoryId: number): Promise<Category | null> {
+export async function getCategoryById(
+  categoryId: number,
+): Promise<Category | null> {
   try {
     const response = await fetchApi(`/admin/categories/${categoryId}`);
     const payload = await response.json().catch(() => null);
 
     if (response.status === 404) return null;
-    if (!response.ok) throw new Error(getMessage(payload, "Failed to load category."));
+    if (!response.ok)
+      throw new Error(getMessage(payload, "Failed to load category."));
 
     const item = extractOne(payload);
     return item ? normalizeCategory(item) : null;
