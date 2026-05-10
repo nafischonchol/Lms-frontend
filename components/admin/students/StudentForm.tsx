@@ -15,6 +15,7 @@ import { createStudentAction, updateStudentAction } from "@/lib/api/student-acti
 export type StudentFormValues = {
   name: string;
   email: string;
+  phone: string;
   password: string;
   password_confirmation: string;
   is_active: "1" | "0";
@@ -32,6 +33,7 @@ type StudentFormProps = {
 const defaultValues: StudentFormValues = {
   name: "",
   email: "",
+  phone: "",
   password: "",
   password_confirmation: "",
   is_active: "1",
@@ -73,6 +75,7 @@ export function StudentForm({
         const payload = new FormData();
         payload.append("name", form.name);
         payload.append("email", form.email);
+        payload.append("phone", form.phone);
 
         if (mode === "add") {
           payload.append("is_active", form.is_active);
@@ -118,7 +121,7 @@ export function StudentForm({
           </CardHeader>
         ) : null}
         <CardContent className="space-y-5">
-          <div className="grid gap-5 md:grid-cols-2">
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
               <Input
@@ -130,13 +133,22 @@ export function StudentForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                value={form.phone}
+                onChange={(event) => setForm((prev) => ({ ...prev, phone: event.target.value }))}
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email (Optional)</Label>
               <Input
                 id="email"
                 type="email"
                 value={form.email}
                 onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
-                required
               />
             </div>
           </div>

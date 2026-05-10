@@ -52,6 +52,7 @@ export default async function EditStudentPage({
         initialValues={{
           name: student.name,
           email: student.email,
+          phone: student.phone || "",
           is_active: student.is_active ? "1" : "0",
           password: "",
           password_confirmation: "",

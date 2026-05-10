@@ -43,6 +43,7 @@ export default async function EditUserPage({
         userId={id}
         initialValues={{
           name: user.name,
+          phone: user.phone,
           email: user.email,
           is_active: user.is_active ? "1" : "0",
           password: "",

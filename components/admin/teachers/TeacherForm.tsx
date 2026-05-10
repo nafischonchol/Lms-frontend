@@ -14,6 +14,7 @@ import { createTeacherAction, updateTeacherAction } from "@/lib/api/teacher-acti
 
 export type TeacherFormValues = {
   name: string;
+  phone: string;
   email: string;
   password: string;
   password_confirmation: string;
@@ -31,6 +32,7 @@ type TeacherFormProps = {
 
 const defaultValues: TeacherFormValues = {
   name: "",
+  phone: "",
   email: "",
   password: "",
   password_confirmation: "",
@@ -72,6 +74,7 @@ export function TeacherForm({
 
         const payload = new FormData();
         payload.append("name", form.name);
+        payload.append("phone", form.phone);
         payload.append("email", form.email);
 
         if (mode === "add") {
@@ -130,15 +133,24 @@ export function TeacherForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="phone">Phone</Label>
               <Input
-                id="email"
-                type="email"
-                value={form.email}
-                onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
+                id="phone"
+                value={form.phone}
+                onChange={(event) => setForm((prev) => ({ ...prev, phone: event.target.value }))}
                 required
               />
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">Email (Optional)</Label>
+            <Input
+              id="email"
+              type="email"
+              value={form.email}
+              onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
+            />
           </div>
 
           <div className="grid gap-5 md:grid-cols-2">

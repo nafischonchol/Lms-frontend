@@ -6,6 +6,7 @@ export type StudentApiModel = {
   id: string;
   name: string;
   email: string;
+  phone: string | null;
   is_active: boolean;
   enrolled_courses_count?: number;
   completed_courses_count?: number;
@@ -110,6 +111,7 @@ function normalizeStudent(value: unknown): StudentApiModel {
     id: asString(item.id),
     name: asString(item.name),
     email: asString(item.email),
+    phone: asStringOrNull(item.phone),
     is_active: asBoolean(item.is_active, true),
     enrolled_courses_count:
       item.enrolled_courses_count !== undefined

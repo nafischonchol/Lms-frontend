@@ -67,8 +67,12 @@ export default async function StudentDetailsPage({
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Phone</p>
+            <p className="mt-1 text-sm text-slate-800">{student.phone || "-"}</p>
+          </div>
+          <div>
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Email</p>
-            <p className="mt-1 text-sm text-slate-800">{student.email}</p>
+            <p className="mt-1 text-sm text-slate-800">{student.email || "-"}</p>
           </div>
           <div>
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Status</p>

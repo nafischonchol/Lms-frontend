@@ -73,6 +73,7 @@ export default async function UsersListPage({
                 <tr>
                   <th className="px-6 py-4 font-semibold">ID</th>
                   <th className="px-6 py-4 font-semibold">Name</th>
+                  <th className="px-6 py-4 font-semibold">Phone</th>
                   <th className="px-6 py-4 font-semibold">Email</th>
                   <th className="px-6 py-4 font-semibold">Status</th>
                   <th className="px-6 py-4 font-semibold text-right">Action</th>
@@ -83,6 +84,7 @@ export default async function UsersListPage({
                   <tr key={user.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="px-6 py-4 text-slate-600">#{user.id}</td>
                     <td className="px-6 py-4 font-medium text-slate-800">{user.name}</td>
+                    <td className="px-6 py-4 text-slate-600">{user.phone}</td>
                     <td className="px-6 py-4 text-slate-600">{user.email}</td>
                     <td className="px-6 py-4 text-slate-600">{formatBoolean(user.is_active, "Active", "Inactive")}</td>
                     <td className="px-6 py-4 text-right">
@@ -100,7 +102,7 @@ export default async function UsersListPage({
                 ))}
                 {users.length === 0 ? (
                   <tr>
-                    <td className="px-6 py-8 text-center text-slate-500" colSpan={5}>
+                    <td className="px-6 py-8 text-center text-slate-500" colSpan={6}>
                       No users found.
                     </td>
                   </tr>

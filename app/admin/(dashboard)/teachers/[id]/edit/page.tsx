@@ -43,6 +43,7 @@ export default async function EditTeacherPage({
         teacherId={id}
         initialValues={{
           name: teacher.name,
+          phone: teacher.phone,
           email: teacher.email,
           is_active: teacher.is_active ? "1" : "0",
           password: "",

@@ -73,6 +73,7 @@ export default async function StudentsListPage({
                 <tr>
                   <th className="px-6 py-4 font-semibold">ID</th>
                   <th className="px-6 py-4 font-semibold">Name</th>
+                  <th className="px-6 py-4 font-semibold">Phone</th>
                   <th className="px-6 py-4 font-semibold">Email</th>
                   <th className="px-6 py-4 font-semibold">Status</th>
                   <th className="px-6 py-4 font-semibold text-right">Action</th>
@@ -83,7 +84,8 @@ export default async function StudentsListPage({
                   <tr key={student.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="px-6 py-4 text-slate-600">#{student.id}</td>
                     <td className="px-6 py-4 font-medium text-slate-800">{student.name}</td>
-                    <td className="px-6 py-4 text-slate-600">{student.email}</td>
+                    <td className="px-6 py-4 text-slate-600">{student.phone || "-"}</td>
+                    <td className="px-6 py-4 text-slate-600">{student.email || "-"}</td>
                     <td className="px-6 py-4 text-slate-600">{formatBoolean(student.is_active, "Active", "Inactive")}</td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
@@ -106,7 +108,7 @@ export default async function StudentsListPage({
                 ))}
                 {students.length === 0 ? (
                   <tr>
-                    <td className="px-6 py-8 text-center text-slate-500" colSpan={5}>
+                    <td className="px-6 py-8 text-center text-slate-500" colSpan={6}>
                       No students found.
                     </td>
                   </tr>
