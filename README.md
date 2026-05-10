@@ -1,9 +1,10 @@
-# yreri LMS
+# LMS Frontend
 
-yreri is a Next.js 16 news portal with:
+A Next.js 16 frontend for the Learning Management System (LMS) with:
 
-- A public customer-facing site for Bangla news content.
-- An admin area for authenticated management workflows.
+- A public-facing site for course browsing and student enrollment.
+- Separate dashboards for students, instructors, and administrators.
+- Rich text editing for course content with Tiptap editor.
 
 ## Tech Stack
 
@@ -11,6 +12,8 @@ yreri is a Next.js 16 news portal with:
 - React 19
 - TypeScript
 - Tailwind CSS 4
+- shadcn/ui components
+- Tiptap rich text editor
 - ESLint 9
 
 ## Getting Started
@@ -51,20 +54,22 @@ npm run dev
 
 ## Project Structure
 
-- `app/(customer)`: Public website pages.
+- `app/(customer)`: Public pages for course browsing.
 - `app/admin/(auth)`: Admin authentication pages.
 - `app/admin/(dashboard)`: Admin dashboard pages and routes.
-- `components/customer`: Customer-facing UI components.
-- `components/admin`: Admin UI, forms, and layout components.
-- `lib/api`: Server-side API helper utilities.
-- `proxy.ts`: Auth guard logic for admin routes.
+- `app/student`: Student dashboard and enrolled courses.
+- `app/instructor`: Instructor dashboard and course management.
+- `components/`: Reusable UI components.
+- `lib/api`: API helper utilities for backend communication.
+- `proxy.ts`: Auth guard logic for protected routes.
 
 ## Authentication Notes
 
-- Admin login stores an `admin_token` HTTP-only cookie.
-- Proxy protects `/admin` routes and redirects unauthorized users to `/admin/login`.
+- Uses Laravel Sanctum token-based authentication.
+- Different token storage for admin, instructor, and student roles.
+- Proxy protects `/admin`, `/student`, and `/instructor` routes.
 
 ## Deployment Notes
 
-- Ensure `NEXT_PUBLIC_API_BASE_URL` points to your live backend API.
-- Use HTTPS in production so secure cookie behavior works as expected.
+- Ensure `NEXT_PUBLIC_API_BASE_URL` points to your live Laravel backend API.
+- Use HTTPS in production for secure authentication.

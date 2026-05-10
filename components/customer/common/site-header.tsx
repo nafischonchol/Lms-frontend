@@ -163,9 +163,15 @@ export function SiteHeader({
               </nav>
               <Link
                 href="/login"
-                className="ml-2 inline-flex items-center rounded-2xl bg-indigo-600 px-5 py-2.5 text-[15px] font-bold text-white shadow transition-all hover:bg-indigo-700 active:scale-95"
+                className="ml-2 inline-flex items-center rounded-2xl bg-white border border-slate-200 px-5 py-2.5 text-[15px] font-bold text-slate-900 shadow-sm transition-all hover:bg-slate-50 active:scale-95"
               >
                 লগইন
+              </Link>
+              <Link
+                href="/register"
+                className="ml-2 inline-flex items-center rounded-2xl bg-indigo-600 px-5 py-2.5 text-[15px] font-bold text-white shadow transition-all hover:bg-indigo-700 active:scale-95"
+              >
+                ভর্তি হোন
               </Link>
             </div>
           </div>
