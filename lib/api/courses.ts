@@ -58,7 +58,7 @@ export type GetCoursesParams = {
   page?: number;
   per_page?: number;
   search?: string;
-  is_active?: "1" | "0";
+  is_popular?: "1" | "0";
   status?: string;
   category_id?: string;
   instructor_id?: string;
@@ -222,10 +222,8 @@ function normalizeCourse(value: unknown): CourseApiModel {
 }
 
 function extractList(payload: unknown): unknown[] {
-  if (Array.isArray(payload)) return payload;
-
   const root = asObject(payload);
-  if (Array.isArray(root.data)) return root.data;
+  if (Array.isArray(root.resources)) return root.resources;
 
   return [];
 }
@@ -275,8 +273,8 @@ export async function getCoursesList(
     if (params?.per_page !== undefined)
       query.set("per_page", String(params.per_page));
     if (params?.search?.trim()) query.set("search", params.search.trim());
-    if (params?.is_active !== undefined)
-      query.set("is_active", params.is_active);
+    if (params?.is_popular !== undefined)
+      query.set("is_popular", params.is_popular);
     if (params?.status) query.set("status", params.status);
     if (params?.category_id) query.set("category_id", params.category_id);
     if (params?.instructor_id) query.set("instructor_id", params.instructor_id);
@@ -344,8 +342,8 @@ export async function getPublicCoursesList(
     if (params?.per_page !== undefined)
       query.set("per_page", String(params.per_page));
     if (params?.search?.trim()) query.set("search", params.search.trim());
-    if (params?.is_active !== undefined)
-      query.set("is_active", params.is_active);
+    if (params?.is_popular !== undefined)
+      query.set("is_popular", params.is_popular);
     if (params?.status) query.set("status", params.status);
     if (params?.category_id) query.set("category_id", params.category_id);
     if (params?.instructor_id) query.set("instructor_id", params.instructor_id);

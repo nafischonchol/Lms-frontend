@@ -1,24 +1,29 @@
-import Link from "next/link"
-import { ChevronRight } from "lucide-react"
-import { CourseCard, type Course } from "@/components/customer/courses/course-card"
-import { getPublicCoursesList, type CourseApiModel } from "@/lib/api/courses"
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
+import {
+  CourseCard,
+  type Course,
+} from "@/components/customer/courses/course-card";
+import { getPublicCoursesList, type CourseApiModel } from "@/lib/api/courses";
 
 function mapApiToCourse(apiCourse: CourseApiModel): Course {
   const levelMap = {
     beginner: "শিক্ষার্থী",
     intermediate: "মধ্যবর্তী",
     advanced: "অ্যাডভান্সড",
-  } as const
+  } as const;
 
   const levelColorMap = {
     beginner: "bg-green-100 text-green-700",
     intermediate: "bg-amber-100 text-amber-700",
     advanced: "bg-red-100 text-red-700",
-  } as const
+  } as const;
 
   return {
     id: String(apiCourse.id),
-    image: apiCourse.thumbnail || `https://picsum.photos/seed/course-${apiCourse.id}/600/400`,
+    image:
+      apiCourse.thumbnail ||
+      `https://picsum.photos/seed/course-${apiCourse.id}/600/400`,
     category: apiCourse.category?.name || "সাধারণ",
     categoryColor: "bg-indigo-100 text-indigo-700",
     title: apiCourse.title,
@@ -26,7 +31,10 @@ function mapApiToCourse(apiCourse: CourseApiModel): Course {
     instructorAvatar: `https://picsum.photos/seed/ins-${apiCourse.instructor_id}/100/100`,
     rating: 4.8, // Default fallback
     reviews: 0,
-    students: Number(apiCourse.enrollments_count || 0) > 0 ? `${apiCourse.enrollments_count}+` : "০+",
+    students:
+      Number(apiCourse.enrollments_count || 0) > 0
+        ? `${apiCourse.enrollments_count}+`
+        : "০+",
     duration: apiCourse.duration || "N/A",
     lessons: Number(apiCourse.lessons_count || 0),
     level: levelMap[apiCourse.level || "beginner"],
@@ -35,19 +43,26 @@ function mapApiToCourse(apiCourse: CourseApiModel): Course {
     originalPrice: undefined,
     isBestseller: false,
     isNew: true,
-  }
+  };
 }
 
 export async function FeaturedCoursesSection() {
-  const { items } = await getPublicCoursesList({ per_page: 6 })
-  const featuredCourses = items.map(mapApiToCourse)
+  const { items } = await getPublicCoursesList({
+    per_page: 6,
+    is_popular: "1",
+  });
+  const featuredCourses = items.map(mapApiToCourse);
 
   return (
     <section className="mt-12">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.15em] text-indigo-600">সেরা কোর্সসমূহ</p>
-          <h2 className="mt-1 text-2xl font-black text-slate-900 sm:text-3xl">জনপ্রিয় কোর্স</h2>
+          <p className="text-xs font-bold uppercase tracking-[0.15em] text-indigo-600">
+            সেরা কোর্সসমূহ
+          </p>
+          <h2 className="mt-1 text-2xl font-black text-slate-900 sm:text-3xl">
+            জনপ্রিয় কোর্স
+          </h2>
         </div>
         <Link
           href="/courses"
@@ -78,5 +93,5 @@ export async function FeaturedCoursesSection() {
         </Link>
       </div>
     </section>
-  )
+  );
 }

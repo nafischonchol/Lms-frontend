@@ -162,6 +162,40 @@ export function CourseForm({
   const handleAddHighlight = () => {
     setField("highlights", [...(form.highlights || []), ""]);
   };
+
+  // Auto-calculate total lessons and duration
+  useEffect(() => {
+    let totalMinutes = 0;
+    (form.curriculum || []).forEach((section) => {
+      (section.lessons || []).forEach((lesson) => {
+        const parts = (lesson.duration || "00:00")
+          .split(":")
+          .map((p) => parseInt(p) || 0);
+        
+        if (parts.length === 2) {
+          // HH:MM
+          totalMinutes += parts[0] * 60 + parts[1];
+        } else if (parts.length === 1) {
+          // MM only
+          totalMinutes += parts[0];
+        }
+      });
+    });
+
+    const h = Math.floor(totalMinutes / 60);
+    const m = totalMinutes % 60;
+    const formatted = `${h.toString().padStart(2, "0")}h ${m.toString().padStart(2, "0")}m`;
+
+    if (form.duration !== formatted) {
+      setForm((prev) => ({ ...prev, duration: formatted }));
+    }
+  }, [form.curriculum, form.duration]);
+
+  const totalLessons = (form.curriculum || []).reduce(
+    (acc, s) => acc + (s.lessons?.length || 0),
+    0,
+  );
+
   const handleUpdateHighlight = (index: number, value: string) => {
     const newHighlights = [...(form.highlights || [])];
     newHighlights[index] = value;
@@ -903,18 +937,16 @@ export function CourseForm({
                     Total Lessons
                   </span>
                   <span className="font-black text-white">
-                    {form.curriculum.reduce(
-                      (acc, s) => acc + s.lessons.length,
-                      0,
-                    )}{" "}
-                    Lessons
+                    {totalLessons} Lessons
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-slate-400 font-bold text-sm">
                     Total Time
                   </span>
-                  <span className="font-black text-white">05h 20m</span>
+                  <span className="font-black text-white">
+                    {form.duration || "00h 00m"}
+                  </span>
                 </div>
 
                 <div className="space-y-3 pt-3 border-t border-slate-800">
@@ -922,16 +954,13 @@ export function CourseForm({
                     <div
                       className="h-full bg-indigo-500 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.6)] transition-all duration-500"
                       style={{
-                        width: `${Math.min(100, (form.curriculum.reduce((acc, s) => acc + s.lessons.length, 0) / 10) * 100)}%`,
+                        width: `${Math.min(100, (totalLessons / 10) * 100)}%`,
                       }}
                     ></div>
                   </div>
                   <p className="text-[10px] text-slate-500 font-bold leading-relaxed">
-                    {form.curriculum.reduce(
-                      (acc, s) => acc + s.lessons.length,
-                      0,
-                    ) < 10
-                      ? `We recommend adding at least ${10 - form.curriculum.reduce((acc, s) => acc + s.lessons.length, 0)} more lessons to ensure course quality.`
+                    {totalLessons < 10
+                      ? `We recommend adding at least ${10 - totalLessons} more lessons to ensure course quality.`
                       : "Great job! Your course has enough lessons for a good student experience."}
                   </p>
                 </div>
