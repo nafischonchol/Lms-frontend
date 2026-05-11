@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Globe, Menu, Moon, Search, X, Sun } from "lucide-react";
+import { ChevronDown, Globe, Menu, Moon, Search, X, Sun, LogOut, User } from "lucide-react";
+import { studentLogoutAction } from "@/lib/api/student-auth";
 
 export type SiteNavLink = {
   label: string;
@@ -23,8 +24,10 @@ const defaultNavLinks: SiteNavLink[] = [
 
 export function SiteHeader({
   navLinks = defaultNavLinks,
+  student,
 }: {
   navLinks?: SiteNavLink[];
+  student?: any;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isCompact, setIsCompact] = useState(false);
@@ -161,18 +164,38 @@ export function SiteHeader({
                   );
                 })}
               </nav>
-              <Link
-                href="/login"
-                className="ml-2 inline-flex items-center rounded-2xl bg-white border border-slate-200 px-5 py-2.5 text-[15px] font-bold text-slate-900 shadow-sm transition-all hover:bg-slate-50 active:scale-95"
-              >
-                লগইন
-              </Link>
-              <Link
-                href="/register"
-                className="ml-2 inline-flex items-center rounded-2xl bg-indigo-600 px-5 py-2.5 text-[15px] font-bold text-white shadow transition-all hover:bg-indigo-700 active:scale-95"
-              >
-                ভর্তি হোন
-              </Link>
+              {student ? (
+                <div className="flex items-center gap-3 ml-4 border-l border-slate-700 pl-4">
+                  <div className="flex flex-col items-end">
+                    <span className="text-[14px] font-bold text-white leading-none">
+                      {student.name}
+                    </span>
+                    <span className="text-[11px] text-slate-400">স্টুডেন্ট</span>
+                  </div>
+                  <button
+                    onClick={() => studentLogoutAction()}
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-all active:scale-95"
+                    title="লগআউট"
+                  >
+                    <LogOut className="h-5 w-5" />
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="ml-2 inline-flex items-center rounded-2xl bg-white border border-slate-200 px-5 py-2.5 text-[15px] font-bold text-slate-900 shadow-sm transition-all hover:bg-slate-50 active:scale-95"
+                  >
+                    লগইন
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="ml-2 inline-flex items-center rounded-2xl bg-indigo-600 px-5 py-2.5 text-[15px] font-bold text-white shadow transition-all hover:bg-indigo-700 active:scale-95"
+                  >
+                    ভর্তি হোন
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -222,20 +245,50 @@ export function SiteHeader({
               ))}
             </nav>
             <div className="px-6 mt-10 space-y-3">
-              <Link
-                href="/login"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center justify-center rounded-2xl bg-white border border-slate-200 py-4.5 text-slate-900 font-bold shadow-sm transition-all hover:bg-slate-50"
-              >
-                লগইন
-              </Link>
-              <Link
-                href="/register"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center justify-center rounded-2xl bg-indigo-600 py-4.5 text-white font-bold shadow-lg shadow-indigo-200/50 transition-all hover:bg-indigo-700"
-              >
-                ভর্তি হোন
-              </Link>
+              {student ? (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+                      <User className="h-6 w-6 text-slate-400" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[15px] font-bold text-slate-900">
+                        {student.name}
+                      </span>
+                      <span className="text-[12px] text-slate-500">
+                        স্টুডেন্ট আইডি: {student.id}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      studentLogoutAction();
+                    }}
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-red-50 py-4.5 text-red-600 font-bold shadow-sm transition-all hover:bg-red-100"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    লগআউট করুন
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center rounded-2xl bg-white border border-slate-200 py-4.5 text-slate-900 font-bold shadow-sm transition-all hover:bg-slate-50"
+                  >
+                    লগইন
+                  </Link>
+                  <Link
+                    href="/register"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center rounded-2xl bg-indigo-600 py-4.5 text-white font-bold shadow-lg shadow-indigo-200/50 transition-all hover:bg-indigo-700"
+                  >
+                    ভর্তি হোন
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

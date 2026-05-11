@@ -60,6 +60,7 @@ export type CourseFormValues = {
   title: string;
   description: string;
   thumbnail: string;
+  video_url: string;
   price: string;
   discounted_price?: string;
   duration: string;
@@ -87,6 +88,7 @@ const defaultValues: CourseFormValues = {
   title: "",
   description: "",
   thumbnail: "",
+  video_url: "",
   price: "",
   discounted_price: "",
   duration: "",
@@ -171,7 +173,7 @@ export function CourseForm({
         const parts = (lesson.duration || "00:00")
           .split(":")
           .map((p) => parseInt(p) || 0);
-        
+
         if (parts.length === 2) {
           // HH:MM
           totalMinutes += parts[0] * 60 + parts[1];
@@ -301,6 +303,7 @@ export function CourseForm({
         if (form.instructor_id)
           payload.append("instructor_id", form.instructor_id);
         if (form.category_id) payload.append("category_id", form.category_id);
+        if (form.video_url) payload.append("video_url", form.video_url);
 
         // Highlights handling
         (form.highlights || [])
@@ -351,13 +354,11 @@ export function CourseForm({
         {/* Main Content Area */}
         <div className="lg:col-span-8 space-y-8">
           {/* Section 1: Basic Information */}
-          <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white rounded-2xl">
+          <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
             <CardContent className="p-8 space-y-8">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-600 text-white font-bold shrink-0 shadow-lg shadow-indigo-200">
-                  1
-                </div>
-                <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+              <div className="flex items-center gap-3 text-indigo-600">
+                <Info size={24} className="opacity-80" />
+                <h2 className="text-xl font-bold text-slate-800 tracking-tight">
                   Basic Information
                 </h2>
               </div>
@@ -366,7 +367,7 @@ export function CourseForm({
                 <div className="space-y-2">
                   <Label
                     htmlFor="title"
-                    className="text-sm font-semibold text-slate-700"
+                    className="text-sm font-bold text-slate-600"
                   >
                     Course Title <span className="text-rose-500">*</span>
                   </Label>
@@ -374,25 +375,9 @@ export function CourseForm({
                     id="title"
                     value={form.title}
                     onChange={(e) => setField("title", e.target.value)}
-                    placeholder="e.g. Learn Programming with Python - From Zero to Hero"
+                    placeholder="e.g. Advanced UI/UX Design Systems"
                     required
-                    className="h-12 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label
-                    htmlFor="description"
-                    className="text-sm font-semibold text-slate-700"
-                  >
-                    Short Description
-                  </Label>
-                  <Textarea
-                    id="description"
-                    value={form.description}
-                    onChange={(e) => setField("description", e.target.value)}
-                    placeholder="Provide a brief overview of this course to attract students..."
-                    className="min-h-[140px] border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all resize-none"
+                    className="h-12 border-slate-200 bg-slate-50/50 rounded-xl focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
                   />
                 </div>
 
@@ -400,7 +385,7 @@ export function CourseForm({
                   <div className="space-y-2">
                     <Label
                       htmlFor="category_id"
-                      className="text-sm font-semibold text-slate-700"
+                      className="text-sm font-bold text-slate-600"
                     >
                       Category
                     </Label>
@@ -408,14 +393,83 @@ export function CourseForm({
                       options={categories}
                       value={form.category_id}
                       onChange={(val) => setField("category_id", val)}
-                      placeholder="— Select Category —"
+                      placeholder="Design & Creative"
                     />
                   </div>
 
                   <div className="space-y-2">
                     <Label
+                      htmlFor="level"
+                      className="text-sm font-bold text-slate-600"
+                    >
+                      Level
+                    </Label>
+                    <Select
+                      id="level"
+                      value={form.level}
+                      onChange={(e) => setField("level", e.target.value)}
+                      className="h-12 border-slate-200 bg-slate-50/50 rounded-xl focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
+                    >
+                      <option value="beginner">Beginner</option>
+                      <option value="intermediate">Intermediate</option>
+                      <option value="advanced">Advanced</option>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="price"
+                      className="text-sm font-bold text-slate-600"
+                    >
+                      Price ($)
+                    </Label>
+                    <div className="relative group">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold group-focus-within:text-indigo-600 transition-all">
+                        $
+                      </span>
+                      <Input
+                        id="price"
+                        value={form.price}
+                        onChange={(e) => setField("price", e.target.value)}
+                        placeholder="49.99"
+                        className="h-12 pl-10 border-slate-200 bg-slate-50/50 rounded-xl focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 font-bold text-slate-800 transition-all"
+                        type="number"
+                        step="0.01"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="discounted_price"
+                      className="text-sm font-bold text-slate-600"
+                    >
+                      Discounted Price ($)
+                    </Label>
+                    <div className="relative group">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold group-focus-within:text-indigo-600 transition-all">
+                        $
+                      </span>
+                      <Input
+                        id="discounted_price"
+                        value={form.discounted_price || ""}
+                        onChange={(e) => setField("discounted_price", e.target.value)}
+                        placeholder="39.99"
+                        className="h-12 pl-10 border-slate-200 bg-slate-50/50 rounded-xl focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 font-bold text-slate-800 transition-all"
+                        type="number"
+                        step="0.01"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-slate-100 pt-6">
+                  <div className="space-y-2">
+                    <Label
                       htmlFor="instructor_id"
-                      className="text-sm font-semibold text-slate-700"
+                      className="text-sm font-bold text-slate-600"
                     >
                       Teacher / Instructor
                     </Label>
@@ -426,32 +480,10 @@ export function CourseForm({
                       placeholder="— Select Teacher —"
                     />
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor="level"
-                      className="text-sm font-semibold text-slate-700"
-                    >
-                      Level
-                    </Label>
-                    <Select
-                      id="level"
-                      value={form.level}
-                      onChange={(e) => setField("level", e.target.value)}
-                      className="h-12 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
-                    >
-                      <option value="beginner">Beginner</option>
-                      <option value="intermediate">Intermediate</option>
-                      <option value="advanced">Advanced</option>
-                    </Select>
-                  </div>
-
                   <div className="space-y-2">
                     <Label
                       htmlFor="mode"
-                      className="text-sm font-semibold text-slate-700"
+                      className="text-sm font-bold text-slate-600"
                     >
                       Course Mode
                     </Label>
@@ -459,7 +491,7 @@ export function CourseForm({
                       id="mode"
                       value={form.mode}
                       onChange={(e) => setField("mode", e.target.value)}
-                      className="h-12 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                      className="h-12 border-slate-200 bg-slate-50/50 rounded-xl focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all"
                     >
                       <option value="online">Online</option>
                       <option value="offline">Offline</option>
@@ -471,15 +503,136 @@ export function CourseForm({
             </CardContent>
           </Card>
 
-          {/* Section 2: Course Curriculum */}
-          <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white rounded-2xl">
+          {/* Section 2: Course Content */}
+          <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+            <CardContent className="p-8 space-y-6">
+              <div className="flex items-center gap-3 text-indigo-600">
+                <FileText size={24} className="opacity-80" />
+                <h2 className="text-xl font-bold text-slate-800 tracking-tight">
+                  Course Content
+                </h2>
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="description"
+                  className="text-sm font-bold text-slate-600"
+                >
+                  Detailed Description
+                </Label>
+                <div className="rounded-xl overflow-hidden border border-slate-200">
+                  <RichTextEditor
+                    content={form.description}
+                    onChange={(content) => setField("description", content)}
+                    placeholder="Write a comprehensive overview of your course..."
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Section 3: Course Media */}
+          <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+            <CardContent className="p-8 space-y-6">
+              <div className="flex items-center gap-3 text-indigo-600">
+                <UploadCloud size={24} className="opacity-80" />
+                <h2 className="text-xl font-bold text-slate-800 tracking-tight">
+                  Course Media
+                </h2>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <div className="space-y-2">
+                  <Label className="text-sm font-bold text-slate-600">
+                    Thumbnail Image
+                  </Label>
+                  <label
+                    htmlFor="thumbnail-upload"
+                    className="group relative flex flex-col items-center justify-center w-full aspect-[16/10] border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50 hover:bg-indigo-50/50 hover:border-indigo-300 transition-all cursor-pointer overflow-hidden"
+                  >
+                    {thumbnailPreviewUrl ? (
+                      <Image
+                        src={thumbnailPreviewUrl}
+                        alt="Thumbnail preview"
+                        fill
+                        className="object-cover"
+                        unoptimized
+                      />
+                    ) : (
+                      <div className="flex flex-col items-center p-4">
+                        <div className="p-3 bg-white rounded-xl shadow-sm mb-3 text-slate-400 group-hover:text-indigo-600 group-hover:scale-110 transition-all">
+                          <UploadCloud size={32} />
+                        </div>
+                        <span className="text-xs font-bold text-slate-500 group-hover:text-indigo-600">
+                          Click to upload or drag & drop
+                        </span>
+                        <span className="text-[10px] text-slate-400 mt-1 uppercase font-black tracking-widest">
+                          JPG, PNG, WEBP (MAX 2MB)
+                        </span>
+                      </div>
+                    )}
+                    <input
+                      id="thumbnail-upload"
+                      type="file"
+                      className="hidden"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] ?? null;
+                        setThumbnailFile(file);
+                      }}
+                    />
+                  </label>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="video_url"
+                      className="text-sm font-bold text-slate-600"
+                    >
+                      Video Introduction (Optional)
+                    </Label>
+                    <div className="bg-indigo-50/30 p-6 rounded-2xl border border-indigo-50 space-y-4">
+                      <div className="flex gap-2">
+                        <Input
+                          id="video_url"
+                          value={form.video_url}
+                          onChange={(e) =>
+                            setField("video_url", e.target.value)
+                          }
+                          placeholder="Paste YouTube or Vimeo URL"
+                          className="h-11 bg-white border-slate-200 rounded-xl"
+                        />
+                        <Button
+                          type="button"
+                          className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl h-11 px-6 font-bold shrink-0"
+                        >
+                          Add URL
+                        </Button>
+                      </div>
+                      <div className="flex items-start gap-2 text-slate-500">
+                        <Video size={16} className="mt-0.5 shrink-0" />
+                        <p className="text-[11px] font-medium leading-tight">
+                          A video preview significantly increases student
+                          enrollment.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Section 4: Course Curriculum */}
+          <Card className="border-none shadow-sm bg-white rounded-2xl">
             <CardContent className="p-8 space-y-8">
               <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-600 text-white font-bold shrink-0 shadow-lg shadow-indigo-200">
-                    2
+                <div className="flex items-center gap-3 text-indigo-600">
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-600 text-white text-sm font-bold">
+                    4
                   </div>
-                  <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                  <h2 className="text-xl font-bold text-slate-800 tracking-tight">
                     Course Curriculum
                   </h2>
                 </div>
@@ -487,9 +640,9 @@ export function CourseForm({
                   type="button"
                   variant="outline"
                   onClick={handleAddSection}
-                  className="border-indigo-600 text-indigo-600 hover:bg-indigo-50 rounded-xl h-11 px-6 font-bold transition-all"
+                  className="border-indigo-600 text-indigo-600 hover:bg-indigo-50 rounded-xl h-10 px-4 font-bold transition-all text-sm"
                 >
-                  <Plus size={18} className="mr-2" />
+                  <Plus size={16} className="mr-2" />
                   Add New Section
                 </Button>
               </div>
@@ -656,7 +809,7 @@ export function CourseForm({
                     <button
                       type="button"
                       onClick={() => handleAddLesson(section.id)}
-                      className="w-full mt-6 py-4 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 font-bold hover:border-indigo-300 hover:text-indigo-500 hover:bg-indigo-50/30 transition-all flex items-center justify-center gap-2"
+                      className="w-full mt-6 py-4 border-2 border-dashed border-slate-200 rounded-xl text-slate-400 font-bold hover:border-indigo-300 hover:text-indigo-50/50 hover:bg-indigo-50/30 transition-all flex items-center justify-center gap-2"
                     >
                       <Plus size={18} />
                       Add New Lesson
@@ -665,15 +818,12 @@ export function CourseForm({
                 ))}
 
                 {form.curriculum.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-16 border-2 border-dashed border-slate-100 rounded-2xl bg-slate-50/30 text-center">
-                    <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mb-4 text-slate-200">
-                      <Plus size={32} />
+                  <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-slate-100 rounded-2xl bg-slate-50/30 text-center">
+                    <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center mb-4 text-slate-200">
+                      <Plus size={24} />
                     </div>
                     <p className="text-slate-400 font-bold text-sm">
                       Click the button above to add your first section
-                    </p>
-                    <p className="text-slate-300 text-xs mt-1">
-                      Organize your course content into sections and lessons
                     </p>
                   </div>
                 )}
@@ -681,15 +831,15 @@ export function CourseForm({
             </CardContent>
           </Card>
 
-          {/* Section 3: Course Highlights */}
-          <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white rounded-2xl">
+          {/* Section 5: Course Highlights */}
+          <Card className="border-none shadow-sm bg-white rounded-2xl">
             <CardContent className="p-8 space-y-8">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-indigo-600 text-white font-bold shrink-0 shadow-lg shadow-indigo-200">
-                  3
+              <div className="flex items-center gap-3 text-indigo-600">
+                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-indigo-600 text-white text-sm font-bold">
+                  5
                 </div>
-                <h2 className="text-xl font-bold text-slate-900 tracking-tight">
-                  Course Highlights (What you will learn)
+                <h2 className="text-xl font-bold text-slate-800 tracking-tight">
+                  Course Highlights
                 </h2>
               </div>
 
@@ -702,7 +852,7 @@ export function CourseForm({
                         handleUpdateHighlight(index, e.target.value)
                       }
                       placeholder="e.g. Master the core concepts of Python programming"
-                      className="h-12 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all bg-slate-50/50"
+                      className="h-12 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all bg-slate-50/50"
                     />
                     <Button
                       type="button"
@@ -722,7 +872,7 @@ export function CourseForm({
                   className="flex items-center gap-2 text-indigo-600 font-bold hover:text-indigo-700 mt-2 transition-colors group"
                 >
                   <div className="w-7 h-7 rounded-full border-2 border-indigo-600 flex items-center justify-center p-1 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                    <Plus size={16} strokeWidth={3} />
+                    <Plus size={14} strokeWidth={3} />
                   </div>
                   Add another point
                 </button>
@@ -733,68 +883,8 @@ export function CourseForm({
 
         {/* Sidebar */}
         <div className="lg:col-span-4 space-y-8">
-          {/* Course Thumbnail */}
-          <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white rounded-2xl">
-            <CardHeader className="px-8 pt-8 pb-4">
-              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                Course Thumbnail
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="px-8 pb-8">
-              <div className="relative">
-                <label
-                  htmlFor="thumbnail-upload"
-                  className="group relative flex flex-col items-center justify-center w-full aspect-[16/10] border-2 border-dashed border-indigo-100 rounded-2xl bg-indigo-50/30 hover:bg-indigo-50 hover:border-indigo-200 transition-all cursor-pointer overflow-hidden"
-                >
-                  {thumbnailPreviewUrl ? (
-                    <Image
-                      src={thumbnailPreviewUrl}
-                      alt="Thumbnail preview"
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                      unoptimized
-                    />
-                  ) : (
-                    <>
-                      <div className="p-5 bg-white rounded-2xl shadow-sm mb-4 text-indigo-600 transition-transform group-hover:scale-110 duration-300">
-                        <UploadCloud size={32} />
-                      </div>
-                      <span className="font-bold text-slate-700">
-                        Upload Image
-                      </span>
-                      <span className="text-[10px] text-slate-400 mt-1 uppercase font-black tracking-widest">
-                        PNG or JPG (Max 2MB)
-                      </span>
-                    </>
-                  )}
-
-                  {thumbnailPreviewUrl && (
-                    <div className="absolute inset-0 bg-indigo-600/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-all duration-300 text-white backdrop-blur-[2px]">
-                      <div className="p-3 bg-white/20 rounded-full mb-2">
-                        <UploadCloud size={24} />
-                      </div>
-                      <span className="text-xs font-black uppercase tracking-wider">
-                        Change Image
-                      </span>
-                    </div>
-                  )}
-                </label>
-                <input
-                  id="thumbnail-upload"
-                  type="file"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0] ?? null;
-                    setThumbnailFile(file);
-                  }}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Course Status */}
-          <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white rounded-2xl overflow-hidden">
+          <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
             <CardHeader className="px-8 pt-8 pb-4">
               <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                 Course Status
@@ -803,9 +893,30 @@ export function CourseForm({
             <CardContent className="px-8 pb-8 space-y-4">
               <div className="grid grid-cols-1 gap-3">
                 {[
-                  { id: "draft", label: "Draft", icon: FileEdit, color: "text-slate-500", bg: "bg-slate-50", border: "border-slate-200" },
-                  { id: "published", label: "Published", icon: Send, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200" },
-                  { id: "archived", label: "Archived", icon: Archive, color: "text-rose-600", bg: "bg-rose-50", border: "border-rose-200" },
+                  {
+                    id: "draft",
+                    label: "Draft",
+                    icon: FileEdit,
+                    color: "text-slate-500",
+                    bg: "bg-slate-50",
+                    border: "border-slate-200",
+                  },
+                  {
+                    id: "published",
+                    label: "Published",
+                    icon: Send,
+                    color: "text-emerald-600",
+                    bg: "bg-emerald-50",
+                    border: "border-emerald-200",
+                  },
+                  {
+                    id: "archived",
+                    label: "Archived",
+                    icon: Archive,
+                    color: "text-rose-600",
+                    bg: "bg-rose-50",
+                    border: "border-rose-200",
+                  },
                 ].map((status) => (
                   <button
                     key={status.id}
@@ -815,26 +926,41 @@ export function CourseForm({
                       "flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left",
                       form.status === status.id
                         ? `${status.bg} ${status.border} shadow-sm`
-                        : "border-transparent hover:bg-slate-50"
+                        : "border-transparent hover:bg-slate-50",
                     )}
                   >
-                    <div className={cn(
-                      "w-10 h-10 rounded-lg flex items-center justify-center transition-colors",
-                      form.status === status.id ? "bg-white shadow-sm" : "bg-slate-100"
-                    )}>
-                      <status.icon className={cn("w-5 h-5", form.status === status.id ? status.color : "text-slate-400")} />
+                    <div
+                      className={cn(
+                        "w-10 h-10 rounded-lg flex items-center justify-center transition-colors",
+                        form.status === status.id
+                          ? "bg-white shadow-sm"
+                          : "bg-slate-100",
+                      )}
+                    >
+                      <status.icon
+                        className={cn(
+                          "w-5 h-5",
+                          form.status === status.id
+                            ? status.color
+                            : "text-slate-400",
+                        )}
+                      />
                     </div>
                     <div>
-                      <div className={cn(
-                        "font-bold text-sm",
-                        form.status === status.id ? "text-slate-900" : "text-slate-500"
-                      )}>
+                      <div
+                        className={cn(
+                          "font-bold text-sm",
+                          form.status === status.id
+                            ? "text-slate-900"
+                            : "text-slate-500",
+                        )}
+                      >
                         {status.label}
                       </div>
                       <div className="text-[10px] text-slate-400 font-medium leading-none mt-1">
-                        {status.id === 'draft' && 'Visible only to you'}
-                        {status.id === 'published' && 'Publicly available'}
-                        {status.id === 'archived' && 'Hidden from public'}
+                        {status.id === "draft" && "Visible only to you"}
+                        {status.id === "published" && "Publicly available"}
+                        {status.id === "archived" && "Hidden from public"}
                       </div>
                     </div>
                     {form.status === status.id && (
@@ -848,65 +974,14 @@ export function CourseForm({
             </CardContent>
           </Card>
 
-          {/* Pricing */}
-          <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden bg-white rounded-2xl">
+          {/* Pricing Summary / Action */}
+          <Card className="border-none shadow-sm overflow-hidden bg-white rounded-2xl">
             <CardContent className="p-8 space-y-6">
-              <div className="space-y-2">
-                <Label
-                  htmlFor="price"
-                  className="text-sm font-semibold text-slate-700"
-                >
-                  Original Price (৳)
-                </Label>
-                <div className="relative group">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold group-focus-within:text-indigo-600 transition-colors">
-                    ৳
-                  </span>
-                  <Input
-                    id="price"
-                    value={form.price}
-                    onChange={(e) => setField("price", e.target.value)}
-                    placeholder="19.99"
-                    className="h-12 pl-10 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-bold text-slate-800 transition-all"
-                    type="number"
-                    step="0.01"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label
-                  htmlFor="discounted_price"
-                  className="text-sm font-semibold text-slate-700"
-                >
-                  Discounted Price (৳)
-                </Label>
-                <div className="relative group">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold group-focus-within:text-indigo-600 transition-colors">
-                    ৳
-                  </span>
-                  <Input
-                    id="discounted_price"
-                    value={form.discounted_price || ""}
-                    onChange={(e) =>
-                      setField("discounted_price", e.target.value)
-                    }
-                    placeholder="9.99"
-                    className="h-12 pl-10 border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 font-bold text-slate-800 transition-all"
-                    type="number"
-                    step="0.01"
-                  />
-                </div>
-                <p className="text-[10px] text-indigo-500 font-black italic uppercase tracking-wider">
-                  50% discount applied
-                </p>
-              </div>
-
               <div className="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 flex gap-4">
                 <div className="text-indigo-600 shrink-0 mt-0.5">
-                  <Info size={20} />
+                  <Info size={18} />
                 </div>
-                <p className="text-xs text-indigo-900/60 leading-relaxed font-bold">
+                <p className="text-[11px] text-indigo-900/60 leading-relaxed font-bold">
                   After publishing, your course will go to the review team.
                   Review can take 24-48 hours.
                 </p>
@@ -928,7 +1003,7 @@ export function CourseForm({
           <Card className="border-none shadow-2xl overflow-hidden bg-slate-900 rounded-3xl text-white">
             <CardContent className="p-8 space-y-6">
               <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
-                Live Preview Status
+                Course Progress
               </h3>
 
               <div className="space-y-5">
@@ -944,15 +1019,15 @@ export function CourseForm({
                   <span className="text-slate-400 font-bold text-sm">
                     Total Time
                   </span>
-                  <span className="font-black text-white">
+                  <span className="font-black text-white text-right">
                     {form.duration || "00h 00m"}
                   </span>
                 </div>
 
                 <div className="space-y-3 pt-3 border-t border-slate-800">
-                  <div className="h-2.5 w-full bg-slate-800 rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-indigo-500 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.6)] transition-all duration-500"
+                      className="h-full bg-indigo-500 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.4)] transition-all duration-500"
                       style={{
                         width: `${Math.min(100, (totalLessons / 10) * 100)}%`,
                       }}
@@ -960,8 +1035,8 @@ export function CourseForm({
                   </div>
                   <p className="text-[10px] text-slate-500 font-bold leading-relaxed">
                     {totalLessons < 10
-                      ? `We recommend adding at least ${10 - totalLessons} more lessons to ensure course quality.`
-                      : "Great job! Your course has enough lessons for a good student experience."}
+                      ? `Add at least ${10 - totalLessons} more lessons for quality.`
+                      : "Course length looks good!"}
                   </p>
                 </div>
               </div>

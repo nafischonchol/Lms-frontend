@@ -127,10 +127,22 @@ export async function studentLoginAction(
 export async function studentLogoutAction() {
   const cookieStore = await cookies();
   cookieStore.delete("student_token");
+  cookieStore.delete("student");
   redirect("/login");
 }
 
 export async function getStudentToken() {
   const cookieStore = await cookies();
   return cookieStore.get("student_token")?.value;
+}
+
+export async function getStudent() {
+  const cookieStore = await cookies();
+  const student = cookieStore.get("student")?.value;
+  if (!student) return null;
+  try {
+    return JSON.parse(student);
+  } catch (error) {
+    return null;
+  }
 }

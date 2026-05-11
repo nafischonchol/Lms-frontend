@@ -20,17 +20,20 @@ export const metadata: Metadata = {
 
 import { SiteHeader } from "@/components/customer/common/site-header";
 import { SiteFooter } from "@/components/customer/common/footer-sections";
+import { getStudent } from "@/lib/api/student-auth";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const student = await getStudent();
+
   return (
     <html lang="en">
       <body className={`${sora.variable} ${sourceSerif.variable} antialiased`}>
         <div className="min-h-screen bg-[#f5f5f5] text-slate-900">
-          <SiteHeader />
+          <SiteHeader student={student} />
           {children}
           <SiteFooter />
         </div>
