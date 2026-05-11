@@ -308,6 +308,27 @@ export async function getCoursesList(
   }
 }
 
+export async function getPublicCourseById(
+  courseId: number,
+): Promise<CourseApiModel | null> {
+  try {
+    const response = await fetchApi(`/courses/${courseId}`);
+    const payload = await response.json().catch(() => null);
+
+    if (response.status === 404) return null;
+
+    if (!response.ok) {
+      throw new Error(getMessage(payload, "Failed to load course details."));
+    }
+
+    const item = extractOne(payload);
+    return item ? normalizeCourse(item) : null;
+  } catch (error) {
+    console.error(`Error fetching course ${courseId}:`, error);
+    throw error;
+  }
+}
+
 export async function getCourseById(
   courseId: number,
 ): Promise<CourseApiModel | null> {

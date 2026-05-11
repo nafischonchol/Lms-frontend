@@ -15,7 +15,7 @@ import {
   Infinity,
   Smartphone,
 } from "lucide-react";
-import { getCourseById, getPublicCoursesList } from "@/lib/api/courses";
+import { getPublicCourseById, getPublicCoursesList } from "@/lib/api/courses";
 import { mapApiToCourse } from "@/lib/course-mapper";
 import { type Course } from "@/components/customer/courses/course-card";
 import type { Metadata } from "next";
@@ -35,7 +35,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  const course = await getCourseById(Number(id));
+  const course = await getPublicCourseById(Number(id));
   if (!course) return {};
   return {
     title: `${course.title} | YRERI`,
@@ -59,7 +59,7 @@ function StarRating({ rating, size = "md" }: { rating: number; size?: "sm" | "md
 
 export default async function CourseDetailPage({ params }: Props) {
   const { id } = await params;
-  const apiCourse = await getCourseById(Number(id));
+  const apiCourse = await getPublicCourseById(Number(id));
 
   if (!apiCourse) notFound();
 
@@ -82,7 +82,33 @@ export default async function CourseDetailPage({ params }: Props) {
       ? "তানভীর আহমেদ একজন অভিজ্ঞ সফটওয়্যার ইঞ্জিনিয়ার এবং মেন্টর। তিনি গত ৮ বছর ধরে দেশি-বিদেশি বিভিন্ন টেক কোম্পানিতে কাজ করছেন এবং হাজার হাজার শিক্ষার্থীকে সফলভাবে প্রশিক্ষণ দিয়েছেন।"
       : "আমাদের বিশেষজ্ঞ মেন্টর আপনাকে প্রতিটি পদক্ষেপে সাহায্য করবেন যাতে আপনি আপনার লক্ষ্যে পৌঁছাতে পারেন।";
 
+  // Calculate total lessons and duration from curriculum
   const totalLessons = curriculum.reduce((acc, s) => acc + s.lessons.length, 0);
+
+  // Simple duration sum (assuming HH:MM or MM:SS format)
+  const totalDurationMinutes = (apiCourse.curriculum || []).reduce((acc, section) => {
+    return (
+      acc +
+      section.lessons.reduce((lAcc, lesson) => {
+        if (!lesson.duration) return lAcc;
+        const [h, m] = lesson.duration.split(":").map(Number);
+        return lAcc + (isNaN(m) ? h : h * 60 + m);
+      }, 0)
+    );
+  }, 0);
+
+  const formattedDuration =
+    totalDurationMinutes > 0
+      ? totalDurationMinutes >= 60
+        ? `${Math.floor(totalDurationMinutes / 60)} ঘণ্টা ${totalDurationMinutes % 60} মিনিট`
+        : `${totalDurationMinutes} মিনিট`
+      : course.duration;
+
+  // Override values for display
+  course.lessons = totalLessons;
+  if (course.duration === "N/A" || !apiCourse.duration) {
+    course.duration = formattedDuration;
+  }
 
   return (
     <main>
