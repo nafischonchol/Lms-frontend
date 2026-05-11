@@ -32,9 +32,17 @@ export default async function CoursesListPage({
   const { items: courses, pagination } = coursesResult;
 
   const startItem =
-    pagination.total === 0 ? 0 : (pagination.currentPage - 1) * pagination.perPage + 1;
-  const endItem = Math.min(pagination.currentPage * pagination.perPage, pagination.total);
-  const pageLinks = Array.from({ length: pagination.lastPage }, (_, idx) => idx + 1);
+    pagination.total === 0
+      ? 0
+      : (pagination.currentPage - 1) * pagination.perPage + 1;
+  const endItem = Math.min(
+    pagination.currentPage * pagination.perPage,
+    pagination.total,
+  );
+  const pageLinks = Array.from(
+    { length: pagination.lastPage },
+    (_, idx) => idx + 1,
+  );
 
   const getPageHref = (pageNumber: number) => {
     const query = new URLSearchParams();
@@ -73,14 +81,19 @@ export default async function CoursesListPage({
                   <th className="px-6 py-4 font-semibold">Title</th>
                   <th className="px-6 py-4 font-semibold">Category</th>
                   <th className="px-6 py-4 font-semibold">Instructor</th>
+                  <th className="px-6 py-4 font-semibold">Price</th>
+                  <th className="px-6 py-4 font-semibold">Discounted Price</th>
+                  <th className="px-6 py-4 font-semibold">Enrollments Count</th>
                   <th className="px-6 py-4 font-semibold">Status</th>
-                  <th className="px-6 py-4 font-semibold">Active</th>
                   <th className="px-6 py-4 font-semibold text-right">Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {courses.map((course) => (
-                  <tr key={course.id} className="hover:bg-slate-50/70 transition-colors">
+                  <tr
+                    key={course.id}
+                    className="hover:bg-slate-50/70 transition-colors"
+                  >
                     <td className="px-6 py-4 text-slate-600">#{course.id}</td>
                     <td className="px-6 py-4 font-medium text-slate-800 max-w-xs truncate">
                       {course.title}
@@ -91,12 +104,17 @@ export default async function CoursesListPage({
                     <td className="px-6 py-4 text-slate-600">
                       {course.instructor?.name ?? "—"}
                     </td>
+                    <td className="px-6 py-4 text-slate-600">{course.price}</td>
+                    <td className="px-6 py-4 text-slate-600">
+                      {course.discounted_price}
+                    </td>
+                    <td className="px-6 py-4 text-slate-600">
+                      {course.enrollments_count}
+                    </td>
                     <td className="px-6 py-4 text-slate-600">
                       {formatStatus(course.status)}
                     </td>
-                    <td className="px-6 py-4 text-slate-600">
-                      {course.is_active ? "Yes" : "No"}
-                    </td>
+
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Link href={`/admin/courses/${course.id}/enroll`}>
@@ -105,10 +123,7 @@ export default async function CoursesListPage({
                             Enroll
                           </Button>
                         </Link>
-                        <CourseStatusToggleButton
-                          courseId={course.id}
-                          isActive={course.is_active}
-                        />
+
                         <Link href={`/admin/courses/${course.id}/edit`}>
                           <Button variant="secondary" size="sm">
                             <Pencil size={14} />
@@ -121,7 +136,10 @@ export default async function CoursesListPage({
                 ))}
                 {courses.length === 0 ? (
                   <tr>
-                    <td className="px-6 py-8 text-center text-slate-500" colSpan={7}>
+                    <td
+                      className="px-6 py-8 text-center text-slate-500"
+                      colSpan={7}
+                    >
                       No courses found.
                     </td>
                   </tr>
@@ -163,7 +181,9 @@ export default async function CoursesListPage({
               ))}
 
               <Link
-                href={getPageHref(Math.min(pagination.lastPage, pagination.currentPage + 1))}
+                href={getPageHref(
+                  Math.min(pagination.lastPage, pagination.currentPage + 1),
+                )}
                 aria-disabled={pagination.currentPage >= pagination.lastPage}
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   pagination.currentPage >= pagination.lastPage

@@ -10,18 +10,33 @@ export type CourseApiModel = {
   description: string | null;
   thumbnail: string | null;
   price: string | null;
+  discounted_price: string | null;
   duration: string | null;
   mode: "online" | "offline" | null;
   level: "beginner" | "intermediate" | "advanced" | null;
   status: "draft" | "published" | "archived";
-  is_active: boolean;
   lessons_count?: number;
   enrollments_count?: number;
   enrollments?: CourseEnrollmentApiModel[];
+  highlights?: string[];
+  curriculum?: CourseSectionApiModel[];
   instructor?: { id: number; name: string } | null;
   category?: { id: number; name: string } | null;
   created_at: string;
   updated_at: string;
+};
+
+export type CourseLessonApiModel = {
+  id: string;
+  title: string;
+  duration: string;
+  type: "video" | "file";
+};
+
+export type CourseSectionApiModel = {
+  id: string;
+  title: string;
+  lessons: CourseLessonApiModel[];
 };
 
 export type CourseEnrollmentApiModel = {
@@ -166,11 +181,11 @@ function normalizeCourse(value: unknown): CourseApiModel {
     description: asStringOrNull(item.description),
     thumbnail: asStringOrNull(item.thumbnail),
     price: asStringOrNull(item.price),
+    discounted_price: asStringOrNull(item.discounted_price),
     duration: asStringOrNull(item.duration),
     mode,
     level,
     status,
-    is_active: asBoolean(item.is_active, true),
     lessons_count:
       item.lessons_count !== undefined ? Number(item.lessons_count) : undefined,
     enrollments_count:
@@ -179,6 +194,23 @@ function normalizeCourse(value: unknown): CourseApiModel {
         : undefined,
     enrollments: Array.isArray(item.enrollments)
       ? item.enrollments.map(normalizeEnrollment)
+      : undefined,
+    highlights: Array.isArray(item.highlights)
+      ? item.highlights.map((h) => String(h))
+      : undefined,
+    curriculum: Array.isArray(item.curriculum)
+      ? item.curriculum.map((section: any) => ({
+          id: String(section.id || ""),
+          title: String(section.title || ""),
+          lessons: Array.isArray(section.lessons)
+            ? section.lessons.map((lesson: any) => ({
+                id: String(lesson.id || ""),
+                title: String(lesson.title || ""),
+                duration: String(lesson.duration || ""),
+                type: lesson.type === "file" ? "file" : "video",
+              }))
+            : [],
+        }))
       : undefined,
     instructor,
     category,
@@ -203,8 +235,26 @@ function extractOne(payload: unknown): unknown | null {
   }
 
   const root = asObject(payload);
-  if (root.data && typeof root.data === "object" && !Array.isArray(root.data)) {
-    return root.data;
+  const resources = asObject(root.resources);
+  const candidates = [
+    root.course,
+    root.data,
+    root.resource,
+    root.item,
+    resources.course,
+    resources.data,
+    resources.item,
+    resources,
+  ];
+
+  for (const candidate of candidates) {
+    if (
+      candidate &&
+      typeof candidate === "object" &&
+      !Array.isArray(candidate)
+    ) {
+      return candidate;
+    }
   }
 
   return null;

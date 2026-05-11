@@ -54,16 +54,25 @@ export default async function EditCoursePage({
           description: course.description ?? "",
           thumbnail: course.thumbnail ?? "",
           price: course.price ?? "",
-          duration: course.duration ?? "",
+          discounted_price: course.discounted_price ?? "",
           mode: course.mode ?? "",
           level: course.level ?? "",
           status: course.status,
-          is_active: course.is_active ? "1" : "0",
-          instructor_id: course.instructor_id != null ? String(course.instructor_id) : "",
-          category_id: course.category_id != null ? String(course.category_id) : "",
+          highlights: course?.highlights ?? [],
+          curriculum: course?.curriculum ?? [],
+          instructor_id:
+            course.instructor_id != null ? String(course.instructor_id) : "",
+          category_id:
+            course.category_id != null ? String(course.category_id) : "",
         }}
-        teachers={teachersResult.items.map((t) => ({ id: Number(t.id), name: t.name }))}
-        categories={categoriesResult.items.map((c) => ({ id: c.id, name: c.name }))}
+        teachers={teachersResult.items.map((t) => ({
+          id: Number(t.id),
+          name: t.name,
+        }))}
+        categories={categoriesResult.items.map((c) => ({
+          id: c.id,
+          name: c.name,
+        }))}
       />
     </div>
   );

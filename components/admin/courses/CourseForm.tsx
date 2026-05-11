@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
   Save,
@@ -19,6 +20,9 @@ import {
   Eye,
   Check,
   X,
+  Send,
+  Archive,
+  FileEdit,
 } from "lucide-react";
 
 import { Button } from "@/components/admin/ui/button";
@@ -131,7 +135,7 @@ export function CourseForm({
   const [editingSectionId, setEditingSectionId] = useState<string | null>(null);
   const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
 
-  const submitText = mode === "add" ? "Publish Course" : "Update Course";
+  const submitText = mode === "add" ? "Save Course" : "Update Course";
 
   function setField<K extends keyof CourseFormValues>(
     key: K,
@@ -275,9 +279,18 @@ export function CourseForm({
         (form.curriculum || []).forEach((section, sIdx) => {
           payload.append(`curriculum[${sIdx}][title]`, section.title);
           (section.lessons || []).forEach((lesson, lIdx) => {
-            payload.append(`curriculum[${sIdx}][lessons][${lIdx}][title]`, lesson.title);
-            payload.append(`curriculum[${sIdx}][lessons][${lIdx}][duration]`, lesson.duration);
-            payload.append(`curriculum[${sIdx}][lessons][${lIdx}][type]`, lesson.type);
+            payload.append(
+              `curriculum[${sIdx}][lessons][${lIdx}][title]`,
+              lesson.title,
+            );
+            payload.append(
+              `curriculum[${sIdx}][lessons][${lIdx}][duration]`,
+              lesson.duration,
+            );
+            payload.append(
+              `curriculum[${sIdx}][lessons][${lIdx}][type]`,
+              lesson.type,
+            );
           });
         });
 
@@ -742,6 +755,61 @@ export function CourseForm({
                     setThumbnailFile(file);
                   }}
                 />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Course Status */}
+          <Card className="border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white rounded-2xl overflow-hidden">
+            <CardHeader className="px-8 pt-8 pb-4">
+              <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
+                Course Status
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="px-8 pb-8 space-y-4">
+              <div className="grid grid-cols-1 gap-3">
+                {[
+                  { id: "draft", label: "Draft", icon: FileEdit, color: "text-slate-500", bg: "bg-slate-50", border: "border-slate-200" },
+                  { id: "published", label: "Published", icon: Send, color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-200" },
+                  { id: "archived", label: "Archived", icon: Archive, color: "text-rose-600", bg: "bg-rose-50", border: "border-rose-200" },
+                ].map((status) => (
+                  <button
+                    key={status.id}
+                    type="button"
+                    onClick={() => setField("status", status.id)}
+                    className={cn(
+                      "flex items-center gap-3 p-4 rounded-xl border-2 transition-all text-left",
+                      form.status === status.id
+                        ? `${status.bg} ${status.border} shadow-sm`
+                        : "border-transparent hover:bg-slate-50"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-10 h-10 rounded-lg flex items-center justify-center transition-colors",
+                      form.status === status.id ? "bg-white shadow-sm" : "bg-slate-100"
+                    )}>
+                      <status.icon className={cn("w-5 h-5", form.status === status.id ? status.color : "text-slate-400")} />
+                    </div>
+                    <div>
+                      <div className={cn(
+                        "font-bold text-sm",
+                        form.status === status.id ? "text-slate-900" : "text-slate-500"
+                      )}>
+                        {status.label}
+                      </div>
+                      <div className="text-[10px] text-slate-400 font-medium leading-none mt-1">
+                        {status.id === 'draft' && 'Visible only to you'}
+                        {status.id === 'published' && 'Publicly available'}
+                        {status.id === 'archived' && 'Hidden from public'}
+                      </div>
+                    </div>
+                    {form.status === status.id && (
+                      <div className="ml-auto">
+                        <CheckCircle className={cn("w-5 h-5", status.color)} />
+                      </div>
+                    )}
+                  </button>
+                ))}
               </div>
             </CardContent>
           </Card>
