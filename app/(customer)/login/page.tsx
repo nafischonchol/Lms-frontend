@@ -3,16 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  Eye,
-  EyeOff,
-  Github,
-  Globe,
-  Loader2,
-  Lock,
-  Mail,
-  XCircle,
-} from "lucide-react";
+import { Eye, EyeOff, Loader2, Lock, Mail, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,

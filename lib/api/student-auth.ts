@@ -96,9 +96,17 @@ export async function studentLoginAction(
       };
     }
 
-    if (data.token) {
+    if (data?.resources?.token) {
       const cookieStore = await cookies();
-      cookieStore.set("student_token", data.token, {
+      cookieStore.set("student_token", data?.resources?.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+      });
+
+      cookieStore.set("student", JSON.stringify(data?.resources?.student), {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
