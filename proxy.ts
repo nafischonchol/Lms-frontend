@@ -25,9 +25,14 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
+  // If NOT logged in and trying to access profile, redirect to login
+  if (!studentToken && pathname === "/profile") {
+    return NextResponse.redirect(new URL("/login", request.url));
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/login", "/register"],
+  matcher: ["/admin/:path*", "/login", "/register", "/profile"],
 };

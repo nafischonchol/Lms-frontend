@@ -166,19 +166,12 @@ export function SiteHeader({
               </nav>
               {student ? (
                 <div className="flex items-center gap-3 ml-4 border-l border-slate-700 pl-4">
-                  <div className="flex flex-col items-end">
+                  <Link href="/profile" className="flex flex-col items-end hover:opacity-80 transition-opacity">
                     <span className="text-[14px] font-bold text-white leading-none">
                       {student.name}
                     </span>
                     <span className="text-[11px] text-slate-400">স্টুডেন্ট</span>
-                  </div>
-                  <button
-                    onClick={() => studentLogoutAction()}
-                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-all active:scale-95"
-                    title="লগআউট"
-                  >
-                    <LogOut className="h-5 w-5" />
-                  </button>
+                  </Link>
                 </div>
               ) : (
                 <>
@@ -247,7 +240,11 @@ export function SiteHeader({
             <div className="px-6 mt-10 space-y-3">
               {student ? (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-3 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
+                  <Link
+                    href="/profile"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center gap-3 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200 hover:bg-slate-100 transition-colors"
+                  >
                     <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
                       <User className="h-6 w-6 text-slate-400" />
                     </div>
@@ -259,17 +256,7 @@ export function SiteHeader({
                         স্টুডেন্ট আইডি: {student.id}
                       </span>
                     </div>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      studentLogoutAction();
-                    }}
-                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-red-50 py-4.5 text-red-600 font-bold shadow-sm transition-all hover:bg-red-100"
-                  >
-                    <LogOut className="h-5 w-5" />
-                    লগআউট করুন
-                  </button>
+                  </Link>
                 </div>
               ) : (
                 <>
