@@ -11,12 +11,11 @@ export type AuthResult = {
   errors?: Record<string, string[]>;
 };
 
-export async function studentRegisterAction(formData: FormData): Promise<AuthResult> {
-  if (!API_BASE_URL) {
-    return { ok: false, message: "API base URL is not defined." };
-  }
-
+export async function studentRegisterAction(
+  formData: FormData,
+): Promise<AuthResult> {
   const name = formData.get("name");
+  const phone = formData.get("phone");
   const email = formData.get("email");
   const password = formData.get("password");
   const password_confirmation = formData.get("password_confirmation");
@@ -30,6 +29,7 @@ export async function studentRegisterAction(formData: FormData): Promise<AuthRes
       },
       body: JSON.stringify({
         name,
+        phone,
         email,
         password,
         password_confirmation,
@@ -46,9 +46,9 @@ export async function studentRegisterAction(formData: FormData): Promise<AuthRes
       };
     }
 
-    if (data.token) {
+    if (data?.resources?.token) {
       const cookieStore = await cookies();
-      cookieStore.set("student_token", data.token, {
+      cookieStore.set("student_token", data?.resources?.token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
@@ -59,11 +59,16 @@ export async function studentRegisterAction(formData: FormData): Promise<AuthRes
 
     return { ok: true, message: "Registration successful!" };
   } catch (error) {
-    return { ok: false, message: "Something went wrong. Please try again later." };
+    return {
+      ok: false,
+      message: "Something went wrong. Please try again later.",
+    };
   }
 }
 
-export async function studentLoginAction(formData: FormData): Promise<AuthResult> {
+export async function studentLoginAction(
+  formData: FormData,
+): Promise<AuthResult> {
   if (!API_BASE_URL) {
     return { ok: false, message: "API base URL is not defined." };
   }
@@ -104,7 +109,10 @@ export async function studentLoginAction(formData: FormData): Promise<AuthResult
 
     return { ok: true, message: "Login successful!" };
   } catch (error) {
-    return { ok: false, message: "Something went wrong. Please try again later." };
+    return {
+      ok: false,
+      message: "Something went wrong. Please try again later.",
+    };
   }
 }
 

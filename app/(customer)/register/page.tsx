@@ -115,7 +115,7 @@ export default function RegisterPage() {
               <div className="space-y-2">
                 <label
                   className="text-sm font-medium text-slate-200"
-                  htmlFor="email"
+                  htmlFor="phone"
                 >
                   ফোন নম্বর
                 </label>
@@ -127,6 +127,7 @@ export default function RegisterPage() {
                     type="text"
                     placeholder="+8801xxxxxxxxx"
                     className={`w-full rounded-xl border-slate-700 bg-[#0B1221] py-2.5 pl-10 pr-4 text-sm text-white focus:border-[#b38716] focus:outline-none focus:ring-1 focus:ring-[#b38716] transition-all ${fieldErrors.phone ? "border-red-500/50 ring-1 ring-red-500/50" : ""}`}
+                    required
                   />
                 </div>
                 {fieldErrors.phone && (
