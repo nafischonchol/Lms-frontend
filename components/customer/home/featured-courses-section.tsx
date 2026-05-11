@@ -27,7 +27,7 @@ function mapApiToCourse(apiCourse: CourseApiModel): Course {
     category: apiCourse.category?.name || "সাধারণ",
     categoryColor: "bg-indigo-100 text-indigo-700",
     title: apiCourse.title,
-    instructor: apiCourse.instructor?.name || "প্রশিক্ষক",
+    instructor: apiCourse.instructor?.name || "অজানা ইন্সট্রাক্টর",
     instructorAvatar: `https://picsum.photos/seed/ins-${apiCourse.instructor_id}/100/100`,
     rating: 4.8, // Default fallback
     reviews: 0,

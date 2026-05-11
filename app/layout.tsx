@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Sora, Source_Serif_4 } from "next/font/google";
 import "@/app/globals.css";
+import { env } from "process";
 
 const sora = Sora({
   variable: "--font-manrope",
@@ -13,7 +14,7 @@ const sourceSerif = Source_Serif_4({
 });
 
 export const metadata: Metadata = {
-  title: "yreri",
+  title: env.APP_NAME,
   description:
     "yreri LMS Portal is a cutting-edge news platform built with Next.js, designed to deliver the latest news and updates in a sleek and user-friendly interface. With its modern design and seamless navigation, yreri offers an engaging experience for users seeking up-to-date information on various topics. Stay informed with yreri's comprehensive coverage and intuitive features.z",
 };
