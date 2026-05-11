@@ -175,7 +175,7 @@ export function CourseForm({
   // Curriculum management
   const handleAddSection = () => {
     const newSection: Section = {
-      id: Date.now().toString(),
+      id: `new-section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       title: "New Section",
       lessons: [],
     };
@@ -199,7 +199,7 @@ export function CourseForm({
 
   const handleAddLesson = (sectionId: string) => {
     const newLesson: Lesson = {
-      id: Date.now().toString(),
+      id: `new-lesson-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       title: "New Lesson",
       duration: "00:00",
       type: "video",

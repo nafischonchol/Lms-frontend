@@ -12,7 +12,7 @@ export type CourseApiModel = {
   price: string | null;
   discounted_price: string | null;
   duration: string | null;
-  mode: "online" | "offline" | null;
+  mode: "online" | "offline" | "hybrid" | null;
   level: "beginner" | "intermediate" | "advanced" | null;
   status: "draft" | "published" | "archived";
   lessons_count?: number;
@@ -158,7 +158,9 @@ function normalizeCourse(value: unknown): CourseApiModel {
 
   const rawMode = asString(item.mode);
   const mode: CourseApiModel["mode"] =
-    rawMode === "online" || rawMode === "offline" ? rawMode : null;
+    rawMode === "online" || rawMode === "offline" || rawMode === "hybrid"
+      ? rawMode
+      : null;
 
   const rawLevel = asString(item.level);
   const level: CourseApiModel["level"] =
@@ -199,12 +201,12 @@ function normalizeCourse(value: unknown): CourseApiModel {
       ? item.highlights.map((h) => String(h))
       : undefined,
     curriculum: Array.isArray(item.curriculum)
-      ? item.curriculum.map((section: any) => ({
-          id: String(section.id || ""),
+      ? item.curriculum.map((section: any, sIdx) => ({
+          id: String(section.id || `section-${sIdx}-${Date.now()}`),
           title: String(section.title || ""),
           lessons: Array.isArray(section.lessons)
-            ? section.lessons.map((lesson: any) => ({
-                id: String(lesson.id || ""),
+            ? section.lessons.map((lesson: any, lIdx) => ({
+                id: String(lesson.id || `lesson-${sIdx}-${lIdx}-${Date.now()}`),
                 title: String(lesson.title || ""),
                 duration: String(lesson.duration || ""),
                 type: lesson.type === "file" ? "file" : "video",
