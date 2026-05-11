@@ -1,6 +1,6 @@
-import { notFound } from "next/navigation"
-import Image from "next/image"
-import Link from "next/link"
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 import {
   Clock,
   Users,
@@ -14,33 +14,37 @@ import {
   Globe,
   Infinity,
   Smartphone,
-} from "lucide-react"
-import { allCourses } from "@/components/customer/courses/course-data"
-import { courseDetailsData, defaultCourseDetails } from "@/components/customer/courses/course-details-data"
-import type { Course } from "@/components/customer/courses/course-card"
-import type { Metadata } from "next"
+} from "lucide-react";
+import { getCourseById, getPublicCoursesList } from "@/lib/api/courses";
+import { mapApiToCourse } from "@/lib/course-mapper";
+import { type Course } from "@/components/customer/courses/course-card";
+import type { Metadata } from "next";
 
 type Props = {
-  params: Promise<{ id: string }>
-}
+  params: Promise<{ id: string }>;
+};
 
 export async function generateStaticParams() {
-  return allCourses.map((course) => ({ id: course.id }))
-}
-
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = await params
-  const course = allCourses.find((c) => c.id === id)
-  if (!course) return {}
-  return {
-    title: `${course.title} | YRERI`,
-    description: `${course.instructor}-এর কাছ থেকে ${course.title} কোর্সটি শিখুন। ${course.duration} সময়, ${course.lessons} টি লেসন।`,
+  try {
+    const { items } = await getPublicCoursesList({ per_page: 20 });
+    return items.map((course) => ({ id: String(course.id) }));
+  } catch {
+    return [];
   }
 }
 
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
+  const course = await getCourseById(Number(id));
+  if (!course) return {};
+  return {
+    title: `${course.title} | YRERI`,
+    description: course.description || `Learn ${course.title} from YRERI.`,
+  };
+}
 
 function StarRating({ rating, size = "md" }: { rating: number; size?: "sm" | "md" | "lg" }) {
-  const sizes = { sm: "text-sm", md: "text-base", lg: "text-xl" }
+  const sizes = { sm: "text-sm", md: "text-base", lg: "text-xl" };
   return (
     <div className="flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((s) => (
@@ -50,18 +54,35 @@ function StarRating({ rating, size = "md" }: { rating: number; size?: "sm" | "md
         />
       ))}
     </div>
-  )
+  );
 }
 
 export default async function CourseDetailPage({ params }: Props) {
-  const { id } = await params
-  const course = allCourses.find((c) => c.id === id)
+  const { id } = await params;
+  const apiCourse = await getCourseById(Number(id));
 
-  if (!course) notFound()
+  if (!apiCourse) notFound();
 
-  const details = courseDetailsData[id] ?? defaultCourseDetails
-  const { curriculum, whatYouLearn, instructorBio } = details
-  const totalLessons = curriculum.reduce((acc, s) => acc + s.lessons.length, 0)
+  const course = mapApiToCourse(apiCourse);
+
+  // Use real data from API with fallbacks to mock data if empty
+  const curriculum = (apiCourse.curriculum || []).map((s) => ({
+    section: s.title,
+    lessons: s.lessons.map((l) => l.title),
+  }));
+
+  const whatYouLearn = apiCourse.highlights || [
+    "বাস্তব প্রজেক্টের মাধ্যমে হাতে-কলমে শেখা",
+    "ক্যারিয়ার গাইডেন্স এবং সাপোর্ট",
+    "ইন্ডাস্ট্রি স্ট্যান্ডার্ড স্কিল ডেভেলপমেন্ট",
+  ];
+
+  const instructorBio =
+    apiCourse.instructor?.name === "তানভীর আহমেদ"
+      ? "তানভীর আহমেদ একজন অভিজ্ঞ সফটওয়্যার ইঞ্জিনিয়ার এবং মেন্টর। তিনি গত ৮ বছর ধরে দেশি-বিদেশি বিভিন্ন টেক কোম্পানিতে কাজ করছেন এবং হাজার হাজার শিক্ষার্থীকে সফলভাবে প্রশিক্ষণ দিয়েছেন।"
+      : "আমাদের বিশেষজ্ঞ মেন্টর আপনাকে প্রতিটি পদক্ষেপে সাহায্য করবেন যাতে আপনি আপনার লক্ষ্যে পৌঁছাতে পারেন।";
+
+  const totalLessons = curriculum.reduce((acc, s) => acc + s.lessons.length, 0);
 
   return (
     <main>
@@ -116,7 +137,8 @@ export default async function CourseDetailPage({ params }: Props) {
               </h1>
 
               <p className="max-w-2xl text-sm leading-relaxed text-slate-300">
-                এই কোর্সে আপনি হাতে-কলমে শিখবেন। বিশেষজ্ঞ শিক্ষকের গাইডেন্সে বাস্তব প্রজেক্ট করুন এবং আপনার ক্যারিয়ার এগিয়ে নিন।
+                {apiCourse.description ||
+                  "এই কোর্সে আপনি হাতে-কলমে শিখবেন। বিশেষজ্ঞ শিক্ষকের গাইডেন্সে বাস্তব প্রজেক্ট করুন এবং আপনার ক্যারিয়ার এগিয়ে নিন।"}
               </p>
 
               {/* Rating */}
@@ -200,41 +222,43 @@ export default async function CourseDetailPage({ params }: Props) {
             </section>
 
             {/* Course Curriculum */}
-            <section>
-              <h2 className="mb-4 text-lg font-black text-slate-900">কোর্স কারিকুলাম</h2>
-              <p className="mb-4 text-[13px] text-slate-500">
-                {curriculum.length} টি সেকশন • {totalLessons} টি লেসন • {course.duration} মোট সময়
-              </p>
-              <div className="flex flex-col gap-3">
-                {curriculum.map((section, si) => (
-                  <details
-                    key={si}
-                    className="group rounded-2xl border border-slate-100 bg-white shadow-sm"
-                    open={si === 0}
-                  >
-                    <summary className="flex cursor-pointer select-none items-center justify-between gap-3 p-4">
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-indigo-50 text-[12px] font-black text-indigo-600">
-                          {si + 1}
+            {curriculum.length > 0 && (
+              <section>
+                <h2 className="mb-4 text-lg font-black text-slate-900">কোর্স কারিকুলাম</h2>
+                <p className="mb-4 text-[13px] text-slate-500">
+                  {curriculum.length} টি সেকশন • {totalLessons} টি লেসন • {course.duration} মোট সময়
+                </p>
+                <div className="flex flex-col gap-3">
+                  {curriculum.map((section, si) => (
+                    <details
+                      key={si}
+                      className="group rounded-2xl border border-slate-100 bg-white shadow-sm"
+                      open={si === 0}
+                    >
+                      <summary className="flex cursor-pointer select-none items-center justify-between gap-3 p-4">
+                        <div className="flex items-center gap-3">
+                          <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-indigo-50 text-[12px] font-black text-indigo-600">
+                            {si + 1}
+                          </span>
+                          <span className="text-sm font-bold text-slate-900">{section.section}</span>
+                        </div>
+                        <span className="text-[11px] font-semibold text-slate-400">
+                          {section.lessons.length} লেসন
                         </span>
-                        <span className="text-sm font-bold text-slate-900">{section.section}</span>
-                      </div>
-                      <span className="text-[11px] font-semibold text-slate-400">
-                        {section.lessons.length} লেসন
-                      </span>
-                    </summary>
-                    <ul className="divide-y divide-slate-50 border-t border-slate-100 px-4">
-                      {section.lessons.map((lesson, li) => (
-                        <li key={li} className="flex items-center gap-3 py-3">
-                          <PlayCircle className="h-4 w-4 flex-shrink-0 text-indigo-400" />
-                          <span className="text-[13px] text-slate-700">{lesson}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </details>
-                ))}
-              </div>
-            </section>
+                      </summary>
+                      <ul className="divide-y divide-slate-50 border-t border-slate-100 px-4">
+                        {section.lessons.map((lesson, li) => (
+                          <li key={li} className="flex items-center gap-3 py-3">
+                            <PlayCircle className="h-4 w-4 flex-shrink-0 text-indigo-400" />
+                            <span className="text-[13px] text-slate-700">{lesson}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </details>
+                  ))}
+                </div>
+              </section>
+            )}
 
             {/* Instructor */}
             <section className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
@@ -264,9 +288,7 @@ export default async function CourseDetailPage({ params }: Props) {
                       {course.lessons} লেসন
                     </span>
                   </div>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                    {instructorBio}
-                  </p>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">{instructorBio}</p>
                 </div>
               </div>
             </section>
@@ -281,17 +303,10 @@ export default async function CourseDetailPage({ params }: Props) {
         </div>
       </div>
     </main>
-  )
+  );
 }
 
-function EnrollmentCard({
-  course,
-  mobile,
-}: {
-  course: Course
-  mobile?: boolean
-}) {
-
+function EnrollmentCard({ course, mobile }: { course: Course; mobile?: boolean }) {
   return (
     <div
       className={`overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl ${mobile ? "w-full" : ""}`}
@@ -359,5 +374,5 @@ function EnrollmentCard({
         </div>
       </div>
     </div>
-  )
+  );
 }

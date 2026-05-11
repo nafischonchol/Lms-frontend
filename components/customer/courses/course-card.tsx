@@ -1,45 +1,51 @@
-import Link from "next/link"
-import Image from "next/image"
-import { Clock, Users, BookOpen } from "lucide-react"
+import Link from "next/link";
+import Image from "next/image";
+import { Clock, Users, BookOpen } from "lucide-react";
 
 export type Course = {
-  id: string
-  image: string
-  category: string
-  categoryColor: string
-  title: string
-  instructor: string
-  instructorAvatar: string
-  rating: number
-  reviews: number
-  students: string
-  duration: string
-  lessons: number
-  level: "শিক্ষার্থী" | "মধ্যবর্তী" | "অ্যাডভান্সড"
-  levelColor: string
-  price: string
-  originalPrice?: string
-  isFree?: boolean
-  isNew?: boolean
-  isBestseller?: boolean
-}
+  id: string;
+  image: string;
+  category: string;
+  categoryColor: string;
+  title: string;
+  instructor: string;
+  instructorAvatar: string;
+  rating: number;
+  reviews: number;
+  students: string;
+  duration: string;
+  lessons: number;
+  level: "শিক্ষানবিশ" | "মধ্যবর্তী" | "অ্যাডভান্সড";
+  levelColor: string;
+  price: string;
+  originalPrice?: string;
+  isFree?: boolean;
+  isNew?: boolean;
+  isBestseller?: boolean;
+};
 
 function StarRating({ rating }: { rating: number }) {
   return (
     <div className="flex items-center gap-0.5">
       {[1, 2, 3, 4, 5].map((s) => (
-        <span key={s} className={`text-xs ${s <= Math.round(rating) ? "text-amber-400" : "text-slate-200"}`}>
+        <span
+          key={s}
+          className={`text-xs ${s <= Math.round(rating) ? "text-amber-400" : "text-slate-200"}`}
+        >
           ★
         </span>
       ))}
     </div>
-  )
+  );
 }
 
 export function CourseCard({ course }: { course: Course }) {
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl">
-      <Link href={`/courses/${course.id}`} className="relative block overflow-hidden">
+      <Link
+        href={`/courses/${course.id}`}
+        className="relative block overflow-hidden"
+      >
         <Image
           src={course.image}
           alt={course.title}
@@ -68,10 +74,14 @@ export function CourseCard({ course }: { course: Course }) {
 
       <div className="flex flex-1 flex-col gap-3 p-4">
         <div className="flex items-center justify-between">
-          <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${course.categoryColor}`}>
+          <span
+            className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${course.categoryColor}`}
+          >
             {course.category}
           </span>
-          <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${course.levelColor}`}>
+          <span
+            className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${course.levelColor}`}
+          >
             {course.level}
           </span>
         </div>
@@ -91,14 +101,20 @@ export function CourseCard({ course }: { course: Course }) {
             height={24}
             className="h-6 w-6 rounded-full object-cover"
           />
-          <span className="text-[12px] font-semibold text-slate-500">{course.instructor}</span>
+          <span className="text-[12px] font-semibold text-slate-500">
+            {course.instructor}
+          </span>
         </div>
 
         {/* Rating */}
         <div className="flex items-center gap-2">
           <StarRating rating={course.rating} />
-          <span className="text-[12px] font-bold text-amber-500">{course.rating}</span>
-          <span className="text-[11px] text-slate-400">({course.reviews.toLocaleString()} রিভিউ)</span>
+          <span className="text-[12px] font-bold text-amber-500">
+            {course.rating}
+          </span>
+          <span className="text-[11px] text-slate-400">
+            ({course.reviews.toLocaleString()} রিভিউ)
+          </span>
         </div>
 
         {/* Meta */}
@@ -120,9 +136,13 @@ export function CourseCard({ course }: { course: Course }) {
         {/* Price */}
         <div className="mt-auto flex items-center justify-between border-t border-slate-50 pt-3">
           <div className="flex items-baseline gap-2">
-            <span className="text-xl font-black text-indigo-600">{course.price}</span>
+            <span className="text-xl font-black text-indigo-600">
+              {course.price}
+            </span>
             {course.originalPrice && (
-              <span className="text-[12px] font-semibold text-slate-400 line-through">{course.originalPrice}</span>
+              <span className="text-[12px] font-semibold text-slate-400 line-through">
+                {course.originalPrice}
+              </span>
             )}
           </div>
           <Link
@@ -134,5 +154,5 @@ export function CourseCard({ course }: { course: Course }) {
         </div>
       </div>
     </article>
-  )
+  );
 }
