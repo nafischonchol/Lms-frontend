@@ -214,7 +214,7 @@ export function CourseForm({
   const handleAddSection = () => {
     const newSection: Section = {
       id: `new-section-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      title: "New Section",
+      title: "",
       lessons: [],
     };
     setField("curriculum", [...(form.curriculum || []), newSection]);
@@ -315,6 +315,13 @@ export function CourseForm({
           .forEach((h, i) => {
             payload.append(`highlights[${i}]`, h);
           });
+
+        const hasEmptySection = (form.curriculum || []).some(s => !s.title.trim());
+        if (hasEmptySection) {
+          setSubmitError("Please provide a name for all sections.");
+          setIsSubmitting(false);
+          return;
+        }
 
         // Curriculum handling
         (form.curriculum || []).forEach((section, sIdx) => {
@@ -686,16 +693,24 @@ export function CourseForm({
                                   e.target.value,
                                 )
                               }
-                              onKeyDown={(e) =>
-                                e.key === "Enter" && setEditingSectionId(null)
-                              }
+                              placeholder="সেকশনের নাম লিখুন"
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" && section.title.trim()) {
+                                  setEditingSectionId(null);
+                                }
+                              }}
                               className="h-10 bg-white border-indigo-200"
                             />
                             <Button
                               type="button"
                               size="icon"
-                              className="h-10 w-10 bg-indigo-600 text-white"
-                              onClick={() => setEditingSectionId(null)}
+                              disabled={!section.title.trim()}
+                              className="h-10 w-10 bg-indigo-600 text-white disabled:opacity-50"
+                              onClick={() => {
+                                if (section.title.trim()) {
+                                  setEditingSectionId(null);
+                                }
+                              }}
                             >
                               <Check size={18} />
                             </Button>
