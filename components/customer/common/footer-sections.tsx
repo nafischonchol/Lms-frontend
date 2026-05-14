@@ -4,21 +4,34 @@ export function FinalCtaSection() {
   return null
 }
 
-export function SiteFooter() {
-  const courseCategories = [
-    { label: "প্রোগ্রামিং ও টেক", href: "/courses?category=programming" },
-    { label: "ওয়েব ডেভেলপমেন্ট", href: "/courses?category=web" },
-    { label: "ডিজাইন ও ক্রিয়েটিভ", href: "/courses?category=design" },
-    { label: "ব্যবসা ও মার্কেটিং", href: "/courses?category=business" },
-    { label: "ডেটা সায়েন্স", href: "/courses?category=data-science" },
-    { label: "ভাষা শিক্ষা", href: "/courses?category=language" },
-    { label: "মেডিকেল ও স্বাস্থ্য", href: "/courses?category=medical" },
-    { label: "ফটোগ্রাফি ও ভিডিও", href: "/courses?category=photography" },
-    { label: "সংগীত ও শিল্পকলা", href: "/courses?category=arts" },
-    { label: "গণিত ও বিজ্ঞান", href: "/courses?category=science" },
-    { label: "লাইভ ক্লাস", href: "/courses/live" },
-    { label: "বিনামূল্যে কোর্স", href: "/courses?price=free" },
-  ]
+import { getPublicCategoriesList } from "@/lib/api/categories"
+
+export async function SiteFooter() {
+  const { items: categories } = await getPublicCategoriesList({ is_active: true })
+
+  // Fallback if no categories are returned from API
+  const displayCategories = categories.length > 0 
+    ? categories.map(cat => ({ label: cat.name, href: `/courses?category_id=${cat.id}` }))
+    : [
+        { label: "প্রোগ্রামিং ও টেক", href: "/courses?category=programming" },
+        { label: "ওয়েব ডেভেলপমেন্ট", href: "/courses?category=web" },
+        { label: "ডিজাইন ও ক্রিয়েটিভ", href: "/courses?category=design" },
+        { label: "ব্যবসা ও মার্কেটিং", href: "/courses?category=business" },
+        { label: "ডেটা সায়েন্স", href: "/courses?category=data-science" },
+        { label: "ভাষা শিক্ষা", href: "/courses?category=language" },
+      ]
+
+  const column1 = displayCategories.slice(0, 6)
+  const column2 = displayCategories.slice(6, 12)
+
+  // If we have fewer than 7 categories, we might want to add some static "More Courses" links 
+  // like "Live Class" or "Free Courses" if they are not actual categories.
+  if (column2.length === 0 && categories.length > 0) {
+    column2.push(
+      { label: "লাইভ ক্লাস", href: "/courses/live" },
+      { label: "বিনামূল্যে কোর্স", href: "/courses?price=free" }
+    )
+  }
 
   return (
     <footer className="bg-[#0f172a] text-slate-300">
@@ -48,8 +61,8 @@ export function SiteFooter() {
           <div>
             <p className="mb-3 text-sm font-bold uppercase tracking-wider text-white">কোর্স ক্যাটাগরি</p>
             <ul className="space-y-1.5">
-              {courseCategories.slice(0, 6).map((cat) => (
-                <li key={cat.href}>
+              {column1.map((cat, idx) => (
+                <li key={cat.href + idx}>
                   <Link href={cat.href} className="text-sm text-slate-400 transition-colors hover:text-indigo-400">
                     › {cat.label}
                   </Link>
@@ -61,8 +74,8 @@ export function SiteFooter() {
           <div>
             <p className="mb-3 text-sm font-bold uppercase tracking-wider text-white">আরও কোর্স</p>
             <ul className="space-y-1.5">
-              {courseCategories.slice(6).map((cat) => (
-                <li key={cat.href}>
+              {column2.map((cat, idx) => (
+                <li key={cat.href + idx}>
                   <Link href={cat.href} className="text-sm text-slate-400 transition-colors hover:text-indigo-400">
                     › {cat.label}
                   </Link>

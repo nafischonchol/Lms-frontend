@@ -16,6 +16,7 @@ import {
   Smartphone,
 } from "lucide-react";
 import { getPublicCourseById, getPublicCoursesList } from "@/lib/api/courses";
+import { getStudent } from "@/lib/api/student-auth";
 import { mapApiToCourse } from "@/lib/course-mapper";
 import { type Course } from "@/components/customer/courses/course-card";
 import type { Metadata } from "next";
@@ -60,6 +61,7 @@ function StarRating({ rating, size = "md" }: { rating: number; size?: "sm" | "md
 export default async function CourseDetailPage({ params }: Props) {
   const { id } = await params;
   const apiCourse = await getPublicCourseById(Number(id));
+  const student = await getStudent();
 
   if (!apiCourse) notFound();
 
@@ -223,7 +225,7 @@ export default async function CourseDetailPage({ params }: Props) {
 
             {/* Right — Enrollment Card (desktop) */}
             <div className="hidden lg:block">
-              <EnrollmentCard course={course} />
+              <EnrollmentCard course={course} isLoggedIn={!!student} />
             </div>
           </div>
         </div>
@@ -231,7 +233,7 @@ export default async function CourseDetailPage({ params }: Props) {
 
       {/* Mobile Enrollment Card */}
       <div className="mx-auto w-full max-w-screen-2xl px-4 py-4 lg:hidden lg:px-6">
-        <EnrollmentCard course={course} mobile />
+        <EnrollmentCard course={course} isLoggedIn={!!student} mobile />
       </div>
 
       {/* Body */}
@@ -344,7 +346,7 @@ export default async function CourseDetailPage({ params }: Props) {
           {/* Sticky Enrollment Card (desktop) */}
           <div className="hidden lg:block">
             <div className="sticky top-6">
-              <EnrollmentCard course={course} />
+              <EnrollmentCard course={course} isLoggedIn={!!student} />
             </div>
           </div>
         </div>
@@ -353,7 +355,7 @@ export default async function CourseDetailPage({ params }: Props) {
   );
 }
 
-function EnrollmentCard({ course, mobile }: { course: Course; mobile?: boolean }) {
+function EnrollmentCard({ course, mobile, isLoggedIn }: { course: Course; mobile?: boolean; isLoggedIn: boolean }) {
   return (
     <div
       className={`overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl ${mobile ? "w-full" : ""}`}
@@ -393,12 +395,18 @@ function EnrollmentCard({ course, mobile }: { course: Course; mobile?: boolean }
 
         {/* CTA */}
         <div className="mt-4 flex flex-col gap-3">
-          <button className="w-full rounded-xl bg-indigo-600 py-3.5 text-sm font-black text-white shadow-sm shadow-indigo-200 transition hover:bg-indigo-700 active:scale-[0.98]">
-            এখনই ভর্তি হোন
-          </button>
-          <button className="w-full rounded-xl border border-slate-200 bg-white py-3.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
-            উইশলিস্টে যোগ করুন
-          </button>
+          {isLoggedIn ? (
+            <button className="w-full rounded-xl bg-indigo-600 py-3.5 text-sm font-black text-white shadow-sm shadow-indigo-200 transition hover:bg-indigo-700 active:scale-[0.98]">
+              এখনই ভর্তি হোন
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              className="flex w-full items-center justify-center rounded-xl bg-indigo-600 py-3.5 text-sm font-black text-white shadow-sm shadow-indigo-200 transition hover:bg-indigo-700 active:scale-[0.98]"
+            >
+              এখনই ভর্তি হোন
+            </Link>
+          )}
         </div>
 
         <p className="mt-3 text-center text-[11px] text-slate-400">৩০ দিনের মানি-ব্যাক গ্যারান্টি</p>

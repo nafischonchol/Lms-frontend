@@ -111,6 +111,34 @@ export async function getCategoriesList(
   }
 }
 
+export async function getPublicCategoriesList(
+  params?: GetCategoriesParams,
+): Promise<CategoriesListResult> {
+  try {
+    const query = new URLSearchParams();
+    if (params?.search?.trim()) query.set("search", params.search.trim());
+    if (params?.is_active !== undefined)
+      query.set("is_active", String(params.is_active));
+
+    const path = query.toString()
+      ? `/categories?${query.toString()}`
+      : "/categories";
+    const response = await fetchApi(path, {}, { includeAuth: false });
+    const payload = await response.json().catch(() => null);
+
+    if (!response.ok) {
+      throw new Error(getMessage(payload, "Failed to load categories."));
+    }
+
+    return {
+      items: payload?.resources || [],
+    };
+  } catch (error) {
+    console.error("Failed to fetch public categories:", error);
+    return { items: [] };
+  }
+}
+
 export async function getCategoryById(
   categoryId: number,
 ): Promise<Category | null> {
