@@ -293,10 +293,20 @@ export function CourseForm({
         setSubmitError("");
 
         const payload = new FormData();
+        
+        // Laravel PUT workaround for files
+        if (mode === "edit") {
+          payload.append("_method", "PUT");
+        }
+
         payload.append("title", form.title);
         if (form.description?.trim())
           payload.append("description", form.description);
-        if (thumbnailFile) payload.append("thumbnail", thumbnailFile);
+        
+        if (thumbnailFile) {
+          payload.append("thumbnail", thumbnailFile);
+        }
+        
         if (form.price?.trim()) payload.append("price", form.price);
         if (form.discounted_price?.trim())
           payload.append("discounted_price", form.discounted_price);
@@ -339,17 +349,22 @@ export function CourseForm({
               `curriculum[${sIdx}][lessons][${lIdx}][type]`,
               lesson.type,
             );
-            if (lesson.videoFile) {
+            
+            // Only append if it's a real File object (newly selected)
+            if (lesson.videoFile instanceof File) {
               payload.append(
                 `curriculum[${sIdx}][lessons][${lIdx}][video_file]`,
                 lesson.videoFile,
               );
             }
+            
             (lesson.attachments || []).forEach((file, fIdx) => {
-              payload.append(
-                `curriculum[${sIdx}][lessons][${lIdx}][attachments][${fIdx}]`,
-                file,
-              );
+              if (file instanceof File) {
+                payload.append(
+                  `curriculum[${sIdx}][lessons][${lIdx}][attachments][${fIdx}]`,
+                  file,
+                );
+              }
             });
           });
         });

@@ -44,7 +44,7 @@ export async function updateCourseAction(
 ): Promise<CourseActionResult> {
   try {
     const response = await fetchApi(`/admin/courses/${courseId}`, {
-      method: "PUT",
+      method: "POST",
       body: payload,
     });
     const data = await response.json().catch(() => null);
