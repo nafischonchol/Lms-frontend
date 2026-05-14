@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 import { cn } from "@/lib/utils";
 import {
   ArrowLeft,
@@ -293,49 +293,53 @@ export function CourseForm({
         setSubmitError("");
 
         const payload = new FormData();
-        
+
         if (mode === "edit") {
           payload.append("_method", "PUT");
         }
 
         payload.append("title", form.title);
         if (form.description) payload.append("description", form.description);
-        
+
         // Thumbnail handling
         if (thumbnailFile instanceof File) {
           payload.append("thumbnail", thumbnailFile);
         }
-        
+
         payload.append("price", form.price || "0");
-        if (form.discounted_price) payload.append("discounted_price", form.discounted_price);
+        if (form.discounted_price)
+          payload.append("discounted_price", form.discounted_price);
         if (form.duration) payload.append("duration", form.duration);
         payload.append("mode", form.mode);
         payload.append("level", form.level);
         payload.append("status", form.status || "draft");
-        if (form.instructor_id) payload.append("instructor_id", form.instructor_id);
+        if (form.instructor_id)
+          payload.append("instructor_id", form.instructor_id);
         if (form.category_id) payload.append("category_id", form.category_id);
         if (form.video_url) payload.append("video_url", form.video_url);
 
         // Highlights
-        (form.highlights || []).filter(h => h.trim()).forEach((h, i) => {
-          payload.append(`highlights[${i}]`, h);
-        });
+        (form.highlights || [])
+          .filter((h) => h.trim())
+          .forEach((h, i) => {
+            payload.append(`highlights[${i}]`, h);
+          });
 
         // Curriculum
         (form.curriculum || []).forEach((section, sIdx) => {
           payload.append(`curriculum[${sIdx}][title]`, section.title);
-          
+
           (section.lessons || []).forEach((lesson, lIdx) => {
             const prefix = `curriculum[${sIdx}][lessons][${lIdx}]`;
             payload.append(`${prefix}[title]`, lesson.title);
             payload.append(`${prefix}[duration]`, lesson.duration || "");
             payload.append(`${prefix}[type]`, lesson.type);
-            
+
             // Critical: Video File Upload
             if (lesson.videoFile instanceof File) {
               payload.append(`${prefix}[video_file]`, lesson.videoFile);
             }
-            
+
             // Attachments
             (lesson.attachments || []).forEach((file, fIdx) => {
               if (file instanceof File) {
@@ -351,13 +355,14 @@ export function CourseForm({
               ? await createCourseAction(payload)
               : await updateCourseAction(courseId!, payload);
 
-          if (!result.ok) {
-            setSubmitError(result.message || "Something went wrong.");
-            return;
+          if (result.ok) {
+            toast.success(result.message);
+            router.push("/admin/courses/list");
+          } else {
+            setSubmitError(result.message);
           }
-
-          router.push("/admin/courses/list");
-        } catch {
+        } catch (error) {
+          console.error("Course submission error:", error);
           setSubmitError("An unexpected error occurred.");
         } finally {
           setIsSubmitting(false);
@@ -469,7 +474,9 @@ export function CourseForm({
                       <Input
                         id="discounted_price"
                         value={form.discounted_price || ""}
-                        onChange={(e) => setField("discounted_price", e.target.value)}
+                        onChange={(e) =>
+                          setField("discounted_price", e.target.value)
+                        }
                         placeholder="39.99"
                         className="h-12 pl-10 border-slate-200 bg-slate-50/50 rounded-xl focus:ring-2 focus:ring-indigo-500/10 focus:border-indigo-500 font-bold text-slate-800 transition-all"
                         type="number"
@@ -741,71 +748,95 @@ export function CourseForm({
                           className="flex items-center justify-between p-4 bg-white border border-slate-100 rounded-xl shadow-sm group hover:border-indigo-200 transition-all"
                         >
                           {editingLessonId === lesson.id ? (
-                              <div className="flex-1 space-y-6 bg-white p-6 rounded-2xl border border-indigo-100 shadow-sm">
-                                <div className="flex items-center gap-2 text-indigo-600 mb-2">
-                                  <Video size={18} />
-                                  <span className="font-bold text-sm">নতুন লেসন</span>
-                                </div>
+                            <div className="flex-1 space-y-6 bg-white p-6 rounded-2xl border border-indigo-100 shadow-sm">
+                              <div className="flex items-center gap-2 text-indigo-600 mb-2">
+                                <Video size={18} />
+                                <span className="font-bold text-sm">
+                                  নতুন লেসন
+                                </span>
+                              </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                  <div className="md:col-span-3">
-                                    <Input
-                                      value={lesson.title}
-                                      autoFocus
-                                      onChange={(e) =>
-                                        handleUpdateLesson(section.id, lesson.id, {
+                              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div className="md:col-span-3">
+                                  <Input
+                                    value={lesson.title}
+                                    autoFocus
+                                    onChange={(e) =>
+                                      handleUpdateLesson(
+                                        section.id,
+                                        lesson.id,
+                                        {
                                           title: e.target.value,
-                                        })
-                                      }
-                                      placeholder="লেসন টাইটেল"
-                                      className="h-12 border-slate-200 bg-slate-50/50 rounded-xl"
-                                    />
-                                  </div>
-                                  <div className="md:col-span-1">
-                                    <Input
-                                      value={lesson.duration}
-                                      onChange={(e) =>
-                                        handleUpdateLesson(section.id, lesson.id, {
+                                        },
+                                      )
+                                    }
+                                    placeholder="লেসন টাইটেল"
+                                    className="h-12 border-slate-200 bg-slate-50/50 rounded-xl"
+                                  />
+                                </div>
+                                <div className="md:col-span-1">
+                                  <Input
+                                    value={lesson.duration}
+                                    onChange={(e) =>
+                                      handleUpdateLesson(
+                                        section.id,
+                                        lesson.id,
+                                        {
                                           duration: e.target.value,
-                                        })
-                                      }
-                                      placeholder="সময় (উদা: ১২:৩০)"
-                                      className="h-12 border-slate-200 bg-slate-50/50 rounded-xl text-center"
-                                    />
-                                  </div>
+                                        },
+                                      )
+                                    }
+                                    placeholder="সময় (উদা: ১২:৩০)"
+                                    className="h-12 border-slate-200 bg-slate-50/50 rounded-xl text-center"
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Video Upload */}
+                              <div className="space-y-2">
+                                <label className="group flex flex-col items-center justify-center w-full py-6 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50 hover:bg-indigo-50/50 hover:border-indigo-300 transition-all cursor-pointer">
+                                  <UploadCloud
+                                    size={24}
+                                    className="text-slate-400 mb-2 group-hover:text-indigo-600"
+                                  />
+                                  <span className="text-xs font-bold text-slate-500 group-hover:text-indigo-600">
+                                    {lesson.videoFile
+                                      ? lesson.videoFile.name
+                                      : "ভিডিও ফাইল আপলোড করুন (এমপি৪)"}
+                                  </span>
+                                  <input
+                                    type="file"
+                                    accept="video/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0];
+                                      if (file)
+                                        handleUpdateLesson(
+                                          section.id,
+                                          lesson.id,
+                                          { videoFile: file },
+                                        );
+                                    }}
+                                  />
+                                </label>
+                              </div>
+
+                              {/* Additional Files */}
+                              <div className="space-y-3 pt-2">
+                                <div className="flex items-center gap-2 text-indigo-600">
+                                  <FileText size={18} />
+                                  <span className="font-bold text-sm">
+                                    অতিরিক্ত ফাইল ও ডকুমেন্টস
+                                  </span>
                                 </div>
 
-                                {/* Video Upload */}
                                 <div className="space-y-2">
-                                  <label
-                                    className="group flex flex-col items-center justify-center w-full py-6 border-2 border-dashed border-slate-200 rounded-xl bg-slate-50/50 hover:bg-indigo-50/50 hover:border-indigo-300 transition-all cursor-pointer"
-                                  >
-                                    <UploadCloud size={24} className="text-slate-400 mb-2 group-hover:text-indigo-600" />
-                                    <span className="text-xs font-bold text-slate-500 group-hover:text-indigo-600">
-                                      {lesson.videoFile ? lesson.videoFile.name : "ভিডিও ফাইল আপলোড করুন (এমপি৪)"}
-                                    </span>
-                                    <input
-                                      type="file"
-                                      accept="video/*"
-                                      className="hidden"
-                                      onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) handleUpdateLesson(section.id, lesson.id, { videoFile: file });
-                                      }}
-                                    />
-                                  </label>
-                                </div>
-
-                                {/* Additional Files */}
-                                <div className="space-y-3 pt-2">
-                                  <div className="flex items-center gap-2 text-indigo-600">
-                                    <FileText size={18} />
-                                    <span className="font-bold text-sm">অতিরিক্ত ফাইল ও ডকুমেন্টস</span>
-                                  </div>
-
-                                  <div className="space-y-2">
-                                    {(lesson.attachments || []).map((file, idx) => (
-                                      <div key={idx} className="flex items-center justify-between p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl">
+                                  {(lesson.attachments || []).map(
+                                    (file, idx) => (
+                                      <div
+                                        key={idx}
+                                        className="flex items-center justify-between p-3 bg-indigo-50/50 border border-indigo-100 rounded-xl"
+                                      >
                                         <div className="flex items-center gap-2">
                                           <div className="p-1.5 bg-white rounded-lg text-rose-500 shadow-sm">
                                             <FileText size={16} />
@@ -817,100 +848,118 @@ export function CourseForm({
                                         <button
                                           type="button"
                                           onClick={() => {
-                                            const newFiles = (lesson.attachments || []).filter((_, i) => i !== idx);
-                                            handleUpdateLesson(section.id, lesson.id, { attachments: newFiles });
+                                            const newFiles = (
+                                              lesson.attachments || []
+                                            ).filter((_, i) => i !== idx);
+                                            handleUpdateLesson(
+                                              section.id,
+                                              lesson.id,
+                                              { attachments: newFiles },
+                                            );
                                           }}
                                           className="text-slate-400 hover:text-rose-500"
                                         >
                                           <X size={18} />
                                         </button>
                                       </div>
-                                    ))}
-                                  </div>
-
-                                  <label className="flex items-center justify-center gap-2 w-full py-3 border-2 border-indigo-600 rounded-xl text-indigo-600 font-bold hover:bg-indigo-50 transition-all cursor-pointer">
-                                    <Plus size={18} />
-                                    <span>Add More Files</span>
-                                    <input
-                                      type="file"
-                                      multiple
-                                      className="hidden"
-                                      onChange={(e) => {
-                                        const files = Array.from(e.target.files || []);
-                                        if (files.length > 0) {
-                                          handleUpdateLesson(section.id, lesson.id, { 
-                                            attachments: [...(lesson.attachments || []), ...files] 
-                                          });
-                                        }
-                                      }}
-                                    />
-                                  </label>
+                                    ),
+                                  )}
                                 </div>
 
-                                <div className="flex justify-end gap-2 pt-2">
+                                <label className="flex items-center justify-center gap-2 w-full py-3 border-2 border-indigo-600 rounded-xl text-indigo-600 font-bold hover:bg-indigo-50 transition-all cursor-pointer">
+                                  <Plus size={18} />
+                                  <span>Add More Files</span>
+                                  <input
+                                    type="file"
+                                    multiple
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const files = Array.from(
+                                        e.target.files || [],
+                                      );
+                                      if (files.length > 0) {
+                                        handleUpdateLesson(
+                                          section.id,
+                                          lesson.id,
+                                          {
+                                            attachments: [
+                                              ...(lesson.attachments || []),
+                                              ...files,
+                                            ],
+                                          },
+                                        );
+                                      }
+                                    }}
+                                  />
+                                </label>
+                              </div>
+
+                              <div className="flex justify-end gap-2 pt-2">
+                                <Button
+                                  type="button"
+                                  onClick={() =>
+                                    handleRemoveLesson(section.id, lesson.id)
+                                  }
+                                  className="h-10 bg-rose-50 text-rose-600 hover:bg-rose-100 border-none px-4 rounded-xl font-bold"
+                                >
+                                  বাতিল
+                                </Button>
+                                <Button
+                                  type="button"
+                                  onClick={() => setEditingLessonId(null)}
+                                  className="h-10 bg-indigo-600 text-white hover:bg-indigo-700 px-8 rounded-xl font-bold"
+                                >
+                                  সেভ করুন
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className="flex items-center gap-3 flex-1">
+                                <div className="text-indigo-600 bg-indigo-50 p-2 rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                  {lesson.type === "video" ? (
+                                    <Video size={18} />
+                                  ) : (
+                                    <FileText size={18} />
+                                  )}
+                                </div>
+                                <span className="font-medium text-slate-700">
+                                  {lesson.title}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-3 ml-4">
+                                <span className="text-xs text-slate-400 font-bold">
+                                  {lesson.duration}
+                                </span>
+                                <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
                                   <Button
                                     type="button"
-                                    onClick={() => handleRemoveLesson(section.id, lesson.id)}
-                                    className="h-10 bg-rose-50 text-rose-600 hover:bg-rose-100 border-none px-4 rounded-xl font-bold"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-slate-300 hover:text-indigo-600"
+                                    onClick={() =>
+                                      setEditingLessonId(lesson.id)
+                                    }
                                   >
-                                    বাতিল
+                                    <Edit2 size={14} />
                                   </Button>
                                   <Button
                                     type="button"
-                                    onClick={() => setEditingLessonId(null)}
-                                    className="h-10 bg-indigo-600 text-white hover:bg-indigo-700 px-8 rounded-xl font-bold"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-slate-300 hover:text-rose-600"
+                                    onClick={() =>
+                                      handleRemoveLesson(section.id, lesson.id)
+                                    }
                                   >
-                                    সেভ করুন
+                                    <Trash2 size={14} />
                                   </Button>
                                 </div>
                               </div>
-                            ) : (
-                              <>
-                                <div className="flex items-center gap-3 flex-1">
-                                  <div className="text-indigo-600 bg-indigo-50 p-2 rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                                    {lesson.type === "video" ? (
-                                      <Video size={18} />
-                                    ) : (
-                                      <FileText size={18} />
-                                    )}
-                                  </div>
-                                  <span className="font-medium text-slate-700">
-                                    {lesson.title}
-                                  </span>
-                                </div>
-
-                                <div className="flex items-center gap-3 ml-4">
-                                  <span className="text-xs text-slate-400 font-bold">
-                                    {lesson.duration}
-                                  </span>
-                                  <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 text-slate-300 hover:text-indigo-600"
-                                      onClick={() =>
-                                        setEditingLessonId(lesson.id)
-                                      }
-                                    >
-                                      <Edit2 size={14} />
-                                    </Button>
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      size="icon"
-                                      className="h-8 w-8 text-slate-300 hover:text-rose-600"
-                                      onClick={() =>
-                                        handleRemoveLesson(section.id, lesson.id)
-                                      }
-                                    >
-                                      <Trash2 size={14} />
-                                    </Button>
-                                  </div>
-                                </div>
-                              </>
-                            )}
-                          </div>
+                            </>
+                          )}
+                        </div>
                       ))}
                     </div>
 
