@@ -68,7 +68,7 @@ export default async function CourseDetailPage({ params }: Props) {
   // Use real data from API with fallbacks to mock data if empty
   const curriculum = (apiCourse.curriculum || []).map((s) => ({
     section: s.title,
-    lessons: s.lessons.map((l) => l.title),
+    lessons: s.lessons,
   }));
 
   const whatYouLearn = apiCourse.highlights || [
@@ -91,8 +91,13 @@ export default async function CourseDetailPage({ params }: Props) {
       acc +
       section.lessons.reduce((lAcc, lesson) => {
         if (!lesson.duration) return lAcc;
-        const [h, m] = lesson.duration.split(":").map(Number);
-        return lAcc + (isNaN(m) ? h : h * 60 + m);
+        const parts = lesson.duration.split(":").map(Number);
+        if (parts.length === 2) {
+          return lAcc + parts[0] * 60 + parts[1];
+        } else if (parts.length === 1) {
+          return lAcc + parts[0];
+        }
+        return lAcc;
       }, 0)
     );
   }, 0);
@@ -106,7 +111,7 @@ export default async function CourseDetailPage({ params }: Props) {
 
   // Override values for display
   course.lessons = totalLessons;
-  if (course.duration === "N/A" || !apiCourse.duration) {
+  if (course.duration === "N/A" || !apiCourse.duration || apiCourse.duration === "00h 00m") {
     course.duration = formattedDuration;
   }
 
@@ -258,25 +263,41 @@ export default async function CourseDetailPage({ params }: Props) {
                   {curriculum.map((section, si) => (
                     <details
                       key={si}
-                      className="group rounded-2xl border border-slate-100 bg-white shadow-sm"
+                      className="group rounded-2xl border border-slate-100 bg-white shadow-sm transition-all duration-300"
                       open={si === 0}
                     >
-                      <summary className="flex cursor-pointer select-none items-center justify-between gap-3 p-4">
+                      <summary className="flex cursor-pointer select-none items-center justify-between gap-3 p-4 hover:bg-slate-50 transition-colors rounded-t-2xl group-open:bg-slate-50/50">
                         <div className="flex items-center gap-3">
-                          <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-indigo-50 text-[12px] font-black text-indigo-600">
+                          <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-indigo-50 text-[12px] font-black text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                             {si + 1}
                           </span>
                           <span className="text-sm font-bold text-slate-900">{section.section}</span>
                         </div>
-                        <span className="text-[11px] font-semibold text-slate-400">
-                          {section.lessons.length} লেসন
-                        </span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-[11px] font-semibold text-slate-400">
+                            {section.lessons.length} লেসন
+                          </span>
+                          <ChevronRight className="h-4 w-4 text-slate-400 transition-transform group-open:rotate-90" />
+                        </div>
                       </summary>
-                      <ul className="divide-y divide-slate-50 border-t border-slate-100 px-4">
+                      <ul className="divide-y divide-slate-50 border-t border-slate-100 px-4 pb-2">
                         {section.lessons.map((lesson, li) => (
-                          <li key={li} className="flex items-center gap-3 py-3">
-                            <PlayCircle className="h-4 w-4 flex-shrink-0 text-indigo-400" />
-                            <span className="text-[13px] text-slate-700">{lesson}</span>
+                          <li key={li} className="flex items-center justify-between gap-3 py-3.5 group/lesson">
+                            <div className="flex items-center gap-3">
+                              {lesson.type === "video" ? (
+                                <PlayCircle className="h-4 w-4 flex-shrink-0 text-indigo-400 group-hover/lesson:text-indigo-600" />
+                              ) : (
+                                <BookOpen className="h-4 w-4 flex-shrink-0 text-amber-400 group-hover/lesson:text-amber-600" />
+                              )}
+                              <span className="text-[13px] font-medium text-slate-700 group-hover/lesson:text-slate-900 transition-colors">
+                                {lesson.title}
+                              </span>
+                            </div>
+                            {lesson.duration && (
+                              <span className="text-[11px] font-medium text-slate-400 bg-slate-50 px-2 py-0.5 rounded-full">
+                                {lesson.duration}
+                              </span>
+                            )}
                           </li>
                         ))}
                       </ul>
