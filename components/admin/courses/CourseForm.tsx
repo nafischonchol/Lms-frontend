@@ -294,76 +294,52 @@ export function CourseForm({
 
         const payload = new FormData();
         
-        // Laravel PUT workaround for files
         if (mode === "edit") {
           payload.append("_method", "PUT");
         }
 
         payload.append("title", form.title);
-        if (form.description?.trim())
-          payload.append("description", form.description);
+        if (form.description) payload.append("description", form.description);
         
-        if (thumbnailFile) {
+        // Thumbnail handling
+        if (thumbnailFile instanceof File) {
           payload.append("thumbnail", thumbnailFile);
         }
         
-        if (form.price?.trim()) payload.append("price", form.price);
-        if (form.discounted_price?.trim())
-          payload.append("discounted_price", form.discounted_price);
-        if (form.duration?.trim()) payload.append("duration", form.duration);
-        if (form.mode) payload.append("mode", form.mode);
-        if (form.level) payload.append("level", form.level);
+        payload.append("price", form.price || "0");
+        if (form.discounted_price) payload.append("discounted_price", form.discounted_price);
+        if (form.duration) payload.append("duration", form.duration);
+        payload.append("mode", form.mode);
+        payload.append("level", form.level);
         payload.append("status", form.status || "draft");
-        if (form.instructor_id)
-          payload.append("instructor_id", form.instructor_id);
+        if (form.instructor_id) payload.append("instructor_id", form.instructor_id);
         if (form.category_id) payload.append("category_id", form.category_id);
         if (form.video_url) payload.append("video_url", form.video_url);
 
-        // Highlights handling
-        (form.highlights || [])
-          .filter((h) => h.trim())
-          .forEach((h, i) => {
-            payload.append(`highlights[${i}]`, h);
-          });
+        // Highlights
+        (form.highlights || []).filter(h => h.trim()).forEach((h, i) => {
+          payload.append(`highlights[${i}]`, h);
+        });
 
-        const hasEmptySection = (form.curriculum || []).some(s => !s.title.trim());
-        if (hasEmptySection) {
-          setSubmitError("Please provide a name for all sections.");
-          setIsSubmitting(false);
-          return;
-        }
-
-        // Curriculum handling
+        // Curriculum
         (form.curriculum || []).forEach((section, sIdx) => {
           payload.append(`curriculum[${sIdx}][title]`, section.title);
+          
           (section.lessons || []).forEach((lesson, lIdx) => {
-            payload.append(
-              `curriculum[${sIdx}][lessons][${lIdx}][title]`,
-              lesson.title,
-            );
-            payload.append(
-              `curriculum[${sIdx}][lessons][${lIdx}][duration]`,
-              lesson.duration,
-            );
-            payload.append(
-              `curriculum[${sIdx}][lessons][${lIdx}][type]`,
-              lesson.type,
-            );
+            const prefix = `curriculum[${sIdx}][lessons][${lIdx}]`;
+            payload.append(`${prefix}[title]`, lesson.title);
+            payload.append(`${prefix}[duration]`, lesson.duration || "");
+            payload.append(`${prefix}[type]`, lesson.type);
             
-            // Only append if it's a real File object (newly selected)
+            // Critical: Video File Upload
             if (lesson.videoFile instanceof File) {
-              payload.append(
-                `curriculum[${sIdx}][lessons][${lIdx}][video_file]`,
-                lesson.videoFile,
-              );
+              payload.append(`${prefix}[video_file]`, lesson.videoFile);
             }
             
+            // Attachments
             (lesson.attachments || []).forEach((file, fIdx) => {
               if (file instanceof File) {
-                payload.append(
-                  `curriculum[${sIdx}][lessons][${lIdx}][attachments][${fIdx}]`,
-                  file,
-                );
+                payload.append(`${prefix}[attachments][${fIdx}]`, file);
               }
             });
           });
@@ -392,7 +368,7 @@ export function CourseForm({
         {/* Main Content Area */}
         <div className="lg:col-span-8 space-y-8">
           {/* Section 1: Basic Information */}
-          <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+          <Card className="border-none shadow-sm bg-white rounded-2xl">
             <CardContent className="p-8 space-y-8">
               <div className="flex items-center gap-3 text-indigo-600">
                 <Info size={24} className="opacity-80" />
@@ -542,7 +518,7 @@ export function CourseForm({
           </Card>
 
           {/* Section 2: Course Content */}
-          <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+          <Card className="border-none shadow-sm bg-white rounded-2xl">
             <CardContent className="p-8 space-y-6">
               <div className="flex items-center gap-3 text-indigo-600">
                 <FileText size={24} className="opacity-80" />
@@ -570,7 +546,7 @@ export function CourseForm({
           </Card>
 
           {/* Section 3: Course Media */}
-          <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+          <Card className="border-none shadow-sm bg-white rounded-2xl">
             <CardContent className="p-8 space-y-6">
               <div className="flex items-center gap-3 text-indigo-600">
                 <UploadCloud size={24} className="opacity-80" />
@@ -1016,7 +992,7 @@ export function CourseForm({
         {/* Sidebar */}
         <div className="lg:col-span-4 space-y-8">
           {/* Course Status */}
-          <Card className="border-none shadow-sm bg-white rounded-2xl overflow-hidden">
+          <Card className="border-none shadow-sm bg-white rounded-2xl">
             <CardHeader className="px-8 pt-8 pb-4">
               <CardTitle className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
                 Course Status
@@ -1107,7 +1083,7 @@ export function CourseForm({
           </Card>
 
           {/* Pricing Summary / Action */}
-          <Card className="border-none shadow-sm overflow-hidden bg-white rounded-2xl">
+          <Card className="border-none shadow-sm bg-white rounded-2xl">
             <CardContent className="p-8 space-y-6">
               <div className="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 flex gap-4">
                 <div className="text-indigo-600 shrink-0 mt-0.5">
