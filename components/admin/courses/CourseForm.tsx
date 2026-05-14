@@ -6,8 +6,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { cn } from "@/lib/utils";
 import {
-  ArrowLeft,
-  Save,
   Plus,
   Trash2,
   GripVertical,
@@ -50,6 +48,8 @@ export type Lesson = {
   type: "video" | "file";
   videoFile?: File | null;
   attachments?: File[];
+  video_file?: string | null;
+  existingAttachments?: string[];
 };
 
 export type Section = {
@@ -327,10 +327,16 @@ export function CourseForm({
 
         // Curriculum
         (form.curriculum || []).forEach((section, sIdx) => {
+          if (section.id) {
+            payload.append(`curriculum[${sIdx}][id]`, section.id);
+          }
           payload.append(`curriculum[${sIdx}][title]`, section.title);
 
           (section.lessons || []).forEach((lesson, lIdx) => {
             const prefix = `curriculum[${sIdx}][lessons][${lIdx}]`;
+            if (lesson.id) {
+              payload.append(`${prefix}[id]`, lesson.id);
+            }
             payload.append(`${prefix}[title]`, lesson.title);
             payload.append(`${prefix}[duration]`, lesson.duration || "");
             payload.append(`${prefix}[type]`, lesson.type);
@@ -802,7 +808,9 @@ export function CourseForm({
                                   <span className="text-xs font-bold text-slate-500 group-hover:text-indigo-600">
                                     {lesson.videoFile
                                       ? lesson.videoFile.name
-                                      : "ভিডিও ফাইল আপলোড করুন (এমপি৪)"}
+                                      : lesson.video_file
+                                        ? "ভিডিও ফাইল আছে (পরিবর্তন করতে ক্লিক করুন)"
+                                        : "ভিডিও ফাইল আপলোড করুন (এমপি৪)"}
                                   </span>
                                   <input
                                     type="file"
@@ -831,6 +839,26 @@ export function CourseForm({
                                 </div>
 
                                 <div className="space-y-2">
+                                  {(lesson.existingAttachments || []).map(
+                                    (url, idx) => (
+                                      <div
+                                        key={`existing-${idx}`}
+                                        className="flex items-center justify-between p-3 bg-slate-50 border border-slate-100 rounded-xl"
+                                      >
+                                        <div className="flex items-center gap-2">
+                                          <div className="p-1.5 bg-white rounded-lg text-indigo-500 shadow-sm">
+                                            <FileText size={16} />
+                                          </div>
+                                          <span className="text-sm font-medium text-slate-700 truncate max-w-[200px]">
+                                            {url.split("/").pop()}
+                                          </span>
+                                        </div>
+                                        <div className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+                                          EXISTING
+                                        </div>
+                                      </div>
+                                    ),
+                                  )}
                                   {(lesson.attachments || []).map(
                                     (file, idx) => (
                                       <div

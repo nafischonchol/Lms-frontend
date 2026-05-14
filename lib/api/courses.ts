@@ -200,16 +200,18 @@ function normalizeCourse(value: unknown): CourseApiModel {
     highlights: Array.isArray(item.highlights)
       ? item.highlights.map((h) => String(h))
       : undefined,
-    curriculum: Array.isArray(item.curriculum)
-      ? item.curriculum.map((section: any, sIdx) => ({
+    curriculum: Array.isArray(item.curriculum || item.curriculums)
+      ? (item.curriculum || item.curriculums).map((section: any, sIdx: number) => ({
           id: String(section.id || `section-${sIdx}-${Date.now()}`),
           title: String(section.title || ""),
           lessons: Array.isArray(section.lessons)
-            ? section.lessons.map((lesson: any, lIdx) => ({
+            ? section.lessons.map((lesson: any, lIdx: number) => ({
                 id: String(lesson.id || `lesson-${sIdx}-${lIdx}-${Date.now()}`),
                 title: String(lesson.title || ""),
                 duration: String(lesson.duration || ""),
                 type: lesson.type === "file" ? "file" : "video",
+                video_file: lesson.video_file || null,
+                existingAttachments: Array.isArray(lesson.attachments) ? lesson.attachments : [],
               }))
             : [],
         }))
