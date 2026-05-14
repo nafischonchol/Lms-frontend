@@ -548,9 +548,9 @@ export function CourseForm({
                   Detailed Description
                 </Label>
                 <div className="rounded-xl overflow-hidden border border-slate-200">
-                  <RichTextEditor
-                    content={form.description}
-                    onChange={(content) => setField("description", content)}
+                  <Textarea
+                    value={form.description}
+                    onChange={(e) => setField("description", e.target.value)}
                     placeholder="Write a comprehensive overview of your course..."
                   />
                 </div>
