@@ -7,11 +7,13 @@ export type EnrollmentApiModel = {
   student_id: number;
   course_id: number;
   status: "pending" | "approved" | "rejected";
+  fee: string | null;
   enrolled_at: string | null;
   student: {
     id: number;
     name: string;
     email: string;
+    phone: string | null;
   } | null;
   course: {
     id: number;
@@ -54,6 +56,7 @@ export async function getEnrollmentsList(params?: {
         student_id: item.student_id,
         course_id: item.course_id,
         status: item.status,
+        fee: item.fee,
         enrolled_at: item.enrolled_at,
         student: item.student,
         course: item.course,

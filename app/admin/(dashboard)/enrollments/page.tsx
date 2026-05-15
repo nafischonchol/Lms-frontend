@@ -68,6 +68,7 @@ export default async function EnrollmentsPage({
                   <th className="px-6 py-4 font-semibold">ID</th>
                   <th className="px-6 py-4 font-semibold">Student</th>
                   <th className="px-6 py-4 font-semibold">Course</th>
+                  <th className="px-6 py-4 font-semibold">Fee</th>
                   <th className="px-6 py-4 font-semibold">Date</th>
                   <th className="px-6 py-4 font-semibold">Status</th>
                   <th className="px-6 py-4 font-semibold text-right">Action</th>
@@ -79,11 +80,20 @@ export default async function EnrollmentsPage({
                     <td className="px-6 py-4 text-slate-600">#{enrollment.id}</td>
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
-                        <span className="font-medium text-slate-800">{enrollment.student?.name}</span>
+                        <Link 
+                          href={`/admin/students/${enrollment.student_id}`}
+                          className="font-medium text-slate-800 hover:text-indigo-600 hover:underline transition-colors"
+                        >
+                          {enrollment.student?.name}
+                        </Link>
                         <span className="text-[11px] text-slate-500">{enrollment.student?.email}</span>
+                        <span className="text-[11px] font-semibold text-indigo-600">{enrollment.student?.phone || "-"}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 font-medium text-indigo-600">{enrollment.course?.title}</td>
+                    <td className="px-6 py-4 text-slate-700 font-bold">
+                      {enrollment.fee ? `৳${Number(enrollment.fee).toLocaleString()}` : "-"}
+                    </td>
                     <td className="px-6 py-4 text-slate-600">
                       {enrollment.enrolled_at ? formatDate(enrollment.enrolled_at) : "-"}
                     </td>
