@@ -31,6 +31,11 @@ const menuConfig: MenuSection[] = [
     items: [
       { title: "Dashboard", icon: LayoutDashboard, href: "/admin" },
       {
+        title: "Enrollments",
+        icon: Users,
+        href: "/admin/enrollments",
+      },
+      {
         title: "Courses",
         icon: BookOpen,
         subItems: [

@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/admin/ui/page-header";
 import { Card, CardContent } from "@/components/admin/ui/card";
-import { StudentsListFilters } from "@/components/admin/students/StudentsListFilters";
 import { getEnrollmentsList } from "@/lib/api/enrollments";
 import { EnrollmentStatusButtons } from "@/components/admin/enrollments/EnrollmentStatusButtons";
+import { EnrollmentsListFilters } from "@/components/admin/enrollments/EnrollmentsListFilters";
 
 type SearchParams = Promise<{ page?: string; search?: string; status?: string }>;
 
@@ -55,9 +55,10 @@ export default async function EnrollmentsPage({
 
       <Card>
         <CardContent className="p-0">
-          <StudentsListFilters
+          <EnrollmentsListFilters
             initialSearch={searchValue}
-            title="Enrollment Requests"
+            initialStatus={statusValue}
+            title="Enrollments"
           />
 
           <div className="overflow-x-auto">
@@ -103,7 +104,7 @@ export default async function EnrollmentsPage({
                 {enrollments.length === 0 ? (
                   <tr>
                     <td className="px-6 py-8 text-center text-slate-500" colSpan={6}>
-                      No enrollment requests found.
+                      No enrollments found.
                     </td>
                   </tr>
                 ) : null}
