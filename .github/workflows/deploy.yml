@@ -3,7 +3,7 @@ name: Node.js CD (Auto Deploy)
 on:
   push:
     branches:
-      - develop  
+      - develop
 
 jobs:
   deploy:
@@ -19,8 +19,9 @@ jobs:
           port: 22
           script: |
             set -e
-            cd /projects/yreri  # Apnar server-e project folder-er path
+            cd /home/nexzan/yreri  # Apnar server-e project folder-er path
             git reset --hard HEAD
+
             git config pull.rebase false
             git pull origin develop
             rm -rf .next node_modules
