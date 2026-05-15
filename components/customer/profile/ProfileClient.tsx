@@ -9,16 +9,20 @@ import {
   LogOut, 
   Mail, 
   Phone, 
-  Calendar, 
-  Edit2, 
   ChevronRight, 
   Book, 
-  CheckCircle2, 
   Clock,
-  AlertCircle
+  LayoutDashboard,
+  MessageSquare,
+  HelpCircle,
+  Flame,
+  CheckCircle2,
+  Trophy,
+  Star,
+  GraduationCap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { studentLogoutAction } from "@/lib/api/student-auth";
 import { type EnrollmentApiModel } from "@/lib/api/enrollments";
 import Link from "next/link";
@@ -36,255 +40,162 @@ interface ProfileClientProps {
 export function ProfileClient({ student, enrollments }: ProfileClientProps) {
   const [activeTab, setActiveTab] = useState("overview");
 
+  const sidebarItems = [
+    { id: "overview", label: "Overview", icon: LayoutDashboard },
+    { id: "courses", label: "My Courses", icon: Book },
+    { id: "achievements", label: "Achievements", icon: Trophy },
+    { id: "messages", label: "Messages", icon: MessageSquare },
+    { id: "settings", label: "Settings", icon: Settings },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-20">
-      {/* Profile Header Section */}
-      <div className="relative h-48 w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600">
-        <div className="absolute -bottom-16 left-0 w-full px-4 md:px-8 lg:px-12">
-          <div className="mx-auto max-w-6xl">
-            <div className="flex flex-col md:flex-row items-end md:items-center gap-6">
-              <div className="relative group">
-                <div className="h-32 w-32 rounded-3xl bg-white p-1 shadow-2xl ring-4 ring-white/50 overflow-hidden">
-                  <div className="h-full w-full rounded-2xl bg-slate-100 flex items-center justify-center text-slate-400">
-                    <User className="h-16 w-16" />
-                  </div>
-                </div>
-              </div>
-              <div className="flex-1 text-center md:text-left mb-2 md:mb-0">
-                <h1 className="text-3xl font-black text-slate-900 drop-shadow-sm">{student.name}</h1>
-                <p className="text-slate-600 font-medium flex items-center justify-center md:justify-start gap-2 mt-1">
-                  <span className="inline-block px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full font-bold uppercase tracking-wider">
-                    STU-{student.id}
-                  </span>
-                  • {student.email}
-                </p>
-              </div>
-              <div className="flex gap-3 mb-2 md:mb-0">
-                <Button 
-                  onClick={() => studentLogoutAction()}
-                  className="rounded-xl bg-red-50 text-red-600 hover:bg-red-100 border-none shadow-none font-bold"
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  লগআউট
-                </Button>
+    <div className="flex min-h-screen bg-[#F8FAFC]">
+      {/* Sidebar */}
+      <aside className="w-72 bg-white border-r border-slate-100 flex flex-col hidden lg:flex">
+        <div className="p-8 flex flex-col items-center text-center">
+          <div className="relative mb-4">
+            <div className="h-20 w-20 rounded-full bg-slate-100 ring-4 ring-slate-50 overflow-hidden flex items-center justify-center">
+              <User className="h-10 w-10 text-slate-400" />
+            </div>
+            <div className="absolute bottom-0 right-0 h-5 w-5 bg-emerald-500 border-2 border-white rounded-full"></div>
+          </div>
+          <h2 className="text-xl font-bold text-slate-900">{student.name}</h2>
+          <p className="text-sm text-slate-500 mt-1 font-medium">Student ID: STU-{student.id}</p>
+        </div>
+
+        <nav className="flex-1 px-4 space-y-1">
+          {sidebarItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl transition-all font-semibold ${
+                activeTab === item.id 
+                  ? "bg-[#F3E8FF] text-[#7C3AED]" 
+                  : "text-slate-600 hover:bg-slate-50"
+              }`}
+            >
+              <item.icon className={`h-5 w-5 ${activeTab === item.id ? "text-[#7C3AED]" : "text-slate-400"}`} />
+              {item.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="p-6 mt-auto space-y-4">
+          <Link href="/courses">
+            <Button className="w-full bg-[#10111d] hover:bg-[#1a1c2e] text-white rounded-xl py-6 font-bold">
+              Enrol New Course
+            </Button>
+          </Link>
+          
+          <div className="pt-6 border-t border-slate-100 space-y-1">
+            <button className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-900 transition-colors font-semibold">
+              <HelpCircle className="h-5 w-5" />
+              Help Center
+            </button>
+            <button 
+              onClick={() => studentLogoutAction()}
+              className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-red-600 transition-colors font-semibold"
+            >
+              <LogOut className="h-5 w-5" />
+              Logout
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
+        {/* Header Banner */}
+        <div className="relative w-full bg-[#10111d] rounded-[2.5rem] p-8 lg:p-12 mb-8 overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
+          <div className="relative flex flex-col md:flex-row items-center gap-8">
+            <div className="h-24 w-24 lg:h-32 lg:w-32 rounded-full bg-slate-800 ring-4 ring-white/10 overflow-hidden flex items-center justify-center">
+              <User className="h-12 w-12 lg:h-16 lg:w-16 text-slate-400" />
+            </div>
+            <div className="text-center md:text-left flex-1">
+              <h1 className="text-3xl lg:text-4xl font-bold text-white">{student.name}</h1>
+              <p className="text-slate-400 mt-2 flex items-center justify-center md:justify-start gap-2">
+                <Mail className="h-4 w-4" />
+                {student.email}
+              </p>
+              <div className="flex flex-wrap gap-2 mt-4 justify-center md:justify-start">
+                <span className="px-4 py-1.5 bg-white/5 text-white text-xs rounded-full border border-white/10 font-medium">লেভেল ৪ শিক্ষার্থী</span>
+                <span className="px-4 py-1.5 bg-white/5 text-white text-xs rounded-full border border-white/10 font-medium">কম্পিউটার সায়েন্স</span>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Main Content Container */}
-      <div className="mt-24 mx-auto max-w-6xl px-4 md:px-8 lg:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Left Sidebar: Stats & Info */}
-        <div className="lg:col-span-4 space-y-6">
-          <Card className="rounded-3xl border-none shadow-xl shadow-slate-200/50 overflow-hidden">
-            <CardHeader className="bg-slate-900 text-white pb-8">
-              <CardTitle className="text-lg">একনজরে</CardTitle>
-            </CardHeader>
-            <CardContent className="-mt-6">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center">
-                  <div className="h-10 w-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-2">
-                    <BookOpen className="h-5 w-5" />
-                  </div>
-                  <span className="text-2xl font-black text-slate-900">{enrollments.length}</span>
-                  <span className="text-xs text-slate-500 font-bold uppercase tracking-tighter">কোর্স</span>
-                </div>
-                <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex flex-col items-center justify-center text-center">
-                  <div className="h-10 w-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-2">
-                    <Award className="h-5 w-5" />
-                  </div>
-                  <span className="text-2xl font-black text-slate-900">0</span>
-                  <span className="text-xs text-slate-500 font-bold uppercase tracking-tighter">সার্টিফিকেট</span>
-                </div>
-              </div>
-
-              <div className="mt-8 space-y-4">
-                <div className="flex items-center gap-3 text-slate-600">
-                  <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
-                    <Mail className="h-4 w-4" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">ইমেইল</span>
-                    <span className="text-sm font-semibold">{student.email}</span>
-                  </div>
-                </div>
-                {student.phone && (
-                  <div className="flex items-center gap-3 text-slate-600">
-                    <div className="h-8 w-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-400">
-                      <Phone className="h-4 w-4" />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">ফোন</span>
-                      <span className="text-sm font-semibold">{student.phone}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="rounded-3xl border-none shadow-xl shadow-slate-200/50 p-2">
-            <nav className="space-y-1">
-              <button 
-                onClick={() => setActiveTab("overview")}
-                className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all ${activeTab === "overview" ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "hover:bg-slate-50 text-slate-700"}`}
-              >
-                <div className="flex items-center gap-3">
-                  <Book className="h-5 w-5" />
-                  <span className="font-bold">আমার কোর্সসমূহ</span>
-                </div>
-                <ChevronRight className="h-4 w-4 opacity-50" />
-              </button>
-              <button 
-                onClick={() => setActiveTab("settings")}
-                className={`w-full flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all ${activeTab === "settings" ? "bg-indigo-600 text-white shadow-lg shadow-indigo-200" : "hover:bg-slate-50 text-slate-700"}`}
-              >
-                <div className="flex items-center gap-3">
-                  <Settings className="h-5 w-5" />
-                  <span className="font-bold">সেটিংস</span>
-                </div>
-                <ChevronRight className="h-4 w-4 opacity-50" />
-              </button>
-            </nav>
-          </Card>
+        {/* Content Tabs */}
+        <div className="flex gap-8 border-b border-slate-200 mb-8 px-4">
+          <button className="pb-4 text-slate-900 font-bold border-b-2 border-slate-900">ওভারভিউ</button>
+          <button className="pb-4 text-slate-400 font-bold hover:text-slate-600">প্রোফাইল এডিট করুন</button>
+          <button className="pb-4 text-slate-400 font-bold hover:text-slate-600">নিরাপত্তা</button>
         </div>
 
-        {/* Right Content Area */}
-        <div className="lg:col-span-8">
-          {activeTab === "overview" && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-black text-slate-900">চালু থাকা কোর্সসমূহ</h2>
-                <div className="text-sm font-bold text-indigo-600 bg-indigo-50 px-4 py-1.5 rounded-full">
-                  মোট {enrollments.length} টি
-                </div>
-              </div>
-
-              <div className="grid gap-6">
-                {enrollments.length === 0 ? (
-                  <Card className="rounded-3xl border-2 border-dashed border-slate-200 p-12 text-center">
-                    <div className="mx-auto h-16 w-16 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-300 mb-4">
-                      <BookOpen className="h-8 w-8" />
-                    </div>
-                    <h3 className="text-lg font-bold text-slate-900">আপনি এখনও কোনো কোর্সে ভর্তি হননি</h3>
-                    <p className="text-sm text-slate-500 mt-2 mb-6">আমাদের কোর্সসমূহ দেখে আপনার পছন্দের কোর্সে ভর্তি হন।</p>
-                    <Link href="/courses">
-                      <Button className="rounded-xl bg-indigo-600 font-bold">কোর্সসমূহ দেখুন</Button>
-                    </Link>
-                  </Card>
-                ) : (
-                  enrollments.map((enrollment) => (
-                    <Card key={enrollment.id} className="rounded-3xl border-none shadow-xl shadow-slate-200/40 hover:shadow-2xl transition-all group overflow-hidden">
-                      <div className="flex flex-col sm:flex-row">
-                        <div className="sm:w-48 h-32 sm:h-auto overflow-hidden relative">
-                          <img 
-                            src={enrollment.course?.thumbnail || "https://picsum.photos/seed/course/400/250"} 
-                            alt={enrollment.course?.title}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          />
-                          <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-all"></div>
-                        </div>
-                        <div className="flex-1 p-6 space-y-4">
-                          <div className="flex justify-between items-start gap-4">
-                            <div>
-                              <h3 className="text-lg font-black text-slate-900 group-hover:text-indigo-600 transition-colors leading-tight">
-                                {enrollment.course?.title}
-                              </h3>
-                              <div className="flex items-center gap-2 mt-2">
-                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                                  enrollment.status === "approved" ? "bg-emerald-100 text-emerald-700" :
-                                  enrollment.status === "pending" ? "bg-amber-100 text-amber-700" :
-                                  "bg-red-100 text-red-700"
-                                }`}>
-                                  {enrollment.status === "approved" ? "Active" :
-                                   enrollment.status === "pending" ? "Pending Approval" : "Rejected"}
-                                </span>
-                                {enrollment.fee && (
-                                  <span className="text-[11px] font-bold text-slate-400">৳{Number(enrollment.fee).toLocaleString()}</span>
-                                )}
-                              </div>
-                            </div>
-                            {enrollment.status === "approved" && (
-                              <Link href={`/courses/${enrollment.course_id}`}>
-                                <div className="bg-indigo-600 text-white h-10 w-10 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200 active:scale-95 transition-all cursor-pointer shrink-0">
-                                  <ChevronRight className="h-6 w-6" />
-                                </div>
-                              </Link>
-                            )}
-                          </div>
-
-                          <div className="flex items-center justify-between pt-2">
-                            <div className="flex items-center gap-4">
-                              <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
-                                <Clock className="h-3.5 w-3.5" />
-                                {enrollment.enrolled_at ? new Intl.DateTimeFormat("bn-BD").format(new Date(enrollment.enrolled_at)) : "আবেদন করা হয়েছে"}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
-
-          {activeTab === "settings" && (
-            <div className="space-y-6">
-              <h2 className="text-2xl font-black text-slate-900">অ্যাকাউন্ট সেটিংস</h2>
-              <Card className="rounded-3xl border-none shadow-xl shadow-slate-200/50 p-8 space-y-8">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                    <User className="h-5 w-5 text-indigo-600" />
-                    ব্যক্তিগত তথ্য
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-slate-700">পূর্ণ নাম</label>
-                      <input 
-                        type="text" 
-                        defaultValue={student.name}
-                        disabled
-                        className="w-full rounded-xl border-slate-200 bg-slate-100 py-3 px-4 text-sm text-slate-500 cursor-not-allowed outline-none"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-slate-700">ইমেইল অ্যাড্রেস</label>
-                      <input 
-                        type="email" 
-                        defaultValue={student.email}
-                        disabled
-                        className="w-full rounded-xl border-slate-200 bg-slate-100 py-3 px-4 text-sm text-slate-500 cursor-not-allowed outline-none"
-                      />
-                    </div>
-                    {student.phone && (
-                      <div className="space-y-2">
-                        <label className="text-sm font-bold text-slate-700">ফোন নম্বর</label>
-                        <input 
-                          type="text" 
-                          defaultValue={student.phone}
-                          disabled
-                          className="w-full rounded-xl border-slate-200 bg-slate-100 py-3 px-4 text-sm text-slate-500 cursor-not-allowed outline-none"
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="bg-amber-50 rounded-2xl p-4 flex gap-3 border border-amber-100">
-                  <AlertCircle className="h-5 w-5 text-amber-600 shrink-0" />
-                  <p className="text-xs font-medium text-amber-800">
-                    ব্যক্তিগত তথ্য পরিবর্তনের জন্য অনুগ্রহ করে সাপোর্ট টিমের সাথে যোগাযোগ করুন।
-                  </p>
-                </div>
+        <div className="space-y-8">
+          {/* Enrolled Courses Header */}
+          <div className="flex items-center justify-between px-2">
+            <h2 className="text-2xl font-bold text-slate-900">এনরোল করা কোর্সসমূহ</h2>
+            <Link href="/courses" className="text-sm font-bold text-emerald-600 flex items-center gap-1 hover:gap-2 transition-all">
+              সবগুলো দেখুন <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {enrollments.length === 0 ? (
+              <Card className="col-span-full rounded-[2rem] border-2 border-dashed border-slate-200 p-12 text-center bg-white">
+                <BookOpen className="h-12 w-12 text-slate-200 mx-auto mb-4" />
+                <p className="text-slate-500 font-medium">আপনি এখনও কোনো কোর্সে ভর্তি হননি</p>
+                <Link href="/courses">
+                  <Button className="mt-4 bg-[#10111d] text-white rounded-xl">কোর্সগুলো দেখুন</Button>
+                </Link>
               </Card>
-            </div>
-          )}
+            ) : (
+              enrollments.map((enrollment) => (
+                <Card key={enrollment.id} className="rounded-[1.5rem] border-none shadow-sm hover:shadow-xl transition-all overflow-hidden bg-white group flex flex-col">
+                  {/* Course Thumbnail */}
+                  <div className="relative h-48 w-full overflow-hidden">
+                    <img 
+                      src={enrollment.course?.thumbnail || "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&q=80"} 
+                      alt={enrollment.course?.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-4 right-4 bg-emerald-600 text-white text-[10px] font-bold px-3 py-1 rounded-md">
+                      চলমান
+                    </div>
+                  </div>
+
+                  {/* Course Details */}
+                  <div className="p-6 flex-1 flex flex-col">
+                    <h3 className="text-xl font-bold text-slate-900 mb-2 line-clamp-2 min-h-[3.5rem] group-hover:text-emerald-600 transition-colors">
+                      {enrollment.course?.title}
+                    </h3>
+                    <p className="text-sm text-slate-500 mb-6">প্রশিক্ষক: ড. আনিসুর রহমান</p>
+                    
+                    <div className="mt-auto space-y-3">
+                      {(enrollment.course?.mode === "online" || enrollment.course?.mode === "hybrid") && (
+                        <>
+                          <div className="flex justify-between items-center text-xs font-bold text-slate-400">
+                            <span>অগ্রগতি</span>
+                            <span className="text-emerald-600">৭৫%</span>
+                          </div>
+                          <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-emerald-600 rounded-full" 
+                              style={{ width: "75%" }}
+                            ></div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              ))
+            )}
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
