@@ -18,6 +18,8 @@ export type EnrollmentApiModel = {
   course: {
     id: number;
     title: string;
+    thumbnail: string | null;
+    mode: "online" | "offline" | "hybrid" | null;
   } | null;
 };
 
