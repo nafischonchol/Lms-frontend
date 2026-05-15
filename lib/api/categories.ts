@@ -8,6 +8,8 @@ export interface Category {
   description: string | null;
   is_active: boolean;
   courses_count?: number;
+  slug?: string;
+  parent_id?: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -15,6 +17,8 @@ export interface Category {
 export type GetCategoriesParams = {
   search?: string;
   is_active?: boolean;
+  page?: number;
+  per_page?: number;
 };
 
 export type CategoriesListResult = {
@@ -91,6 +95,8 @@ export async function getCategoriesList(
     if (params?.search?.trim()) query.set("search", params.search.trim());
     if (params?.is_active !== undefined)
       query.set("is_active", String(params.is_active));
+    if (params?.page) query.set("page", String(params.page));
+    if (params?.per_page) query.set("per_page", String(params.per_page));
 
     const path = query.toString()
       ? `/admin/categories?${query.toString()}`
@@ -119,6 +125,8 @@ export async function getPublicCategoriesList(
     if (params?.search?.trim()) query.set("search", params.search.trim());
     if (params?.is_active !== undefined)
       query.set("is_active", String(params.is_active));
+    if (params?.page) query.set("page", String(params.page));
+    if (params?.per_page) query.set("per_page", String(params.per_page));
 
     const path = query.toString()
       ? `/categories?${query.toString()}`

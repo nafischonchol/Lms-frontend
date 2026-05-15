@@ -25,14 +25,8 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
-export async function generateStaticParams() {
-  try {
-    const { items } = await getPublicCoursesList({ per_page: 20 });
-    return items.map((course) => ({ id: String(course.id) }));
-  } catch {
-    return [];
-  }
-}
+export const dynamic = "force-dynamic";
+
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;

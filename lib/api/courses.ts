@@ -200,22 +200,29 @@ function normalizeCourse(value: unknown): CourseApiModel {
     highlights: Array.isArray(item.highlights)
       ? item.highlights.map((h) => String(h))
       : undefined,
-    curriculum: Array.isArray(item.curriculum || item.curriculums)
-      ? (item.curriculum || item.curriculums).map((section: any, sIdx: number) => ({
-          id: String(section.id || `section-${sIdx}-${Date.now()}`),
-          title: String(section.title || ""),
-          lessons: Array.isArray(section.lessons)
-            ? section.lessons.map((lesson: any, lIdx: number) => ({
-                id: String(lesson.id || `lesson-${sIdx}-${lIdx}-${Date.now()}`),
-                title: String(lesson.title || ""),
-                duration: String(lesson.duration || ""),
-                type: lesson.type === "file" ? "file" : "video",
-                video_file: lesson.video_file || null,
-                existingAttachments: Array.isArray(lesson.attachments) ? lesson.attachments : [],
-              }))
-            : [],
-        }))
-      : undefined,
+    curriculum: (() => {
+      const curriculumData = item.curriculum || item.curriculums;
+      return Array.isArray(curriculumData)
+        ? curriculumData.map((section: any, sIdx: number) => ({
+            id: String(section.id || `section-${sIdx}-${Date.now()}`),
+            title: String(section.title || ""),
+            lessons: Array.isArray(section.lessons)
+              ? section.lessons.map((lesson: any, lIdx: number) => ({
+                  id: String(
+                    lesson.id || `lesson-${sIdx}-${lIdx}-${Date.now()}`,
+                  ),
+                  title: String(lesson.title || ""),
+                  duration: String(lesson.duration || ""),
+                  type: lesson.type === "file" ? "file" : "video",
+                  video_file: lesson.video_file || null,
+                  existingAttachments: Array.isArray(lesson.attachments)
+                    ? lesson.attachments
+                    : [],
+                }))
+              : [],
+          }))
+        : undefined;
+    })(),
     instructor,
     category,
     created_at: asString(item.created_at),
@@ -314,7 +321,7 @@ export async function getPublicCourseById(
   courseId: number,
 ): Promise<CourseApiModel | null> {
   try {
-    const response = await fetchApi(`/courses/${courseId}`);
+    const response = await fetchApi(`/courses/${courseId}`, {}, { includeAuth: false });
     const payload = await response.json().catch(() => null);
 
     if (response.status === 404) return null;

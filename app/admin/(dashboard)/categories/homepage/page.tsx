@@ -11,7 +11,7 @@ export default async function HomePageCategoriesPage() {
 
   const topLevelCategories = categories
     .filter((category) => !category.parent_id)
-    .sort((a, b) => a.title.localeCompare(b.title));
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div className="w-full space-y-6 px-3 py-4 md:px-4 lg:px-5">
@@ -26,9 +26,9 @@ export default async function HomePageCategoriesPage() {
 
       <HomepageCategoryManager
         allCategories={topLevelCategories.map((category) => ({
-          id: category.id,
-          title: category.title,
-          slug: category.slug,
+          id: String(category.id),
+          title: category.name,
+          slug: category.slug || category.name.toLowerCase().replace(/ /g, "-"),
         }))}
         initialHomeCategories={currentHomeCategories}
       />

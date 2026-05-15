@@ -5,8 +5,11 @@ import { extractPagination, fetchApi, type BasePagination } from "./common";
 export type TeacherApiModel = {
   id: string;
   name: string;
+  phone: string;
   email: string;
   is_active: boolean;
+  created_at: string;
+  updated_at: string;
 };
 
 export type GetTeachersParams = {
@@ -59,6 +62,9 @@ function normalizeTeacher(value: unknown): TeacherApiModel {
     name: asString(item.name),
     email: asString(item.email),
     is_active: asBoolean(item.is_active, true),
+    phone: asString(item.phone),
+    created_at: asString(item.created_at),
+    updated_at: asString(item.updated_at),
   };
 }
 

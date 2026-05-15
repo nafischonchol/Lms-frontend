@@ -665,7 +665,7 @@ export function CourseForm({
                 </div>
                 <Button
                   type="button"
-                  variant="outline"
+                  variant="secondary"
                   onClick={handleAddSection}
                   className="border-indigo-600 text-indigo-600 hover:bg-indigo-50 rounded-xl h-10 px-4 font-bold transition-all text-sm"
                 >
