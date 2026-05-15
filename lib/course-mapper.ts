@@ -1,6 +1,7 @@
 import { type Course } from "@/components/customer/courses/course-card";
 import { type CourseApiModel } from "@/lib/api/courses";
 
+
 export function mapApiToCourse(apiCourse: CourseApiModel): Course {
   const levelMap = {
     beginner: "শিক্ষানবিশ",

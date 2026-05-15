@@ -104,16 +104,7 @@ const defaultValues: CourseFormValues = {
 };
 
 function resolveThumbnailUrl(value?: string) {
-  if (!value?.trim()) return null;
-  if (value.startsWith("http://") || value.startsWith("https://")) {
-    return value;
-  }
-
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-  const appBaseUrl = apiBaseUrl?.replace(/\/api\/?$/, "") ?? "";
-  const normalizedPath = value.startsWith("/") ? value : `/storage/${value}`;
-
-  return appBaseUrl ? `${appBaseUrl}${normalizedPath}` : normalizedPath;
+  return value || null;
 }
 
 export function CourseForm({
