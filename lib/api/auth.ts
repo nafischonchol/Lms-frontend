@@ -29,10 +29,13 @@ export async function loginUser(email: string, password: string) {
     cookieStore.set("admin_token", data.resources.token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax", // Using lax for better compatibility
+      sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24 * 30, // 30 days
     });
+    
+    // Server-side redirect is more reliable after setting cookies in a server action
+    redirect("/admin");
   }
 
   return data;

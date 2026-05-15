@@ -23,9 +23,11 @@ export function LoginForm() {
     setError("");
 
     try {
-      const data = await loginUser(email, password);
-      router.push("/admin");
+      await loginUser(email, password);
     } catch (err: any) {
+      // Next.js redirect() throws an error, we should ignore it if it's a redirect
+      if (err.message?.includes("NEXT_REDIRECT")) return;
+      
       setError(
         err.message || "A network error occurred. Please try again later.",
       );
