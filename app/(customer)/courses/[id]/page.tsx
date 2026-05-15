@@ -18,6 +18,7 @@ import {
 import { getPublicCourseById, getPublicCoursesList } from "@/lib/api/courses";
 import { getStudent } from "@/lib/api/student-auth";
 import { mapApiToCourse } from "@/lib/course-mapper";
+import { EnrollButton } from "@/components/customer/courses/enroll-button";
 import { type Course } from "@/components/customer/courses/course-card";
 import type { Metadata } from "next";
 
@@ -26,7 +27,6 @@ type Props = {
 };
 
 export const dynamic = "force-dynamic";
-
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
@@ -38,7 +38,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-function StarRating({ rating, size = "md" }: { rating: number; size?: "sm" | "md" | "lg" }) {
+function StarRating({
+  rating,
+  size = "md",
+}: {
+  rating: number;
+  size?: "sm" | "md" | "lg";
+}) {
   const sizes = { sm: "text-sm", md: "text-base", lg: "text-xl" };
   return (
     <div className="flex items-center gap-0.5">
@@ -82,21 +88,24 @@ export default async function CourseDetailPage({ params }: Props) {
   const totalLessons = curriculum.reduce((acc, s) => acc + s.lessons.length, 0);
 
   // Simple duration sum (assuming HH:MM or MM:SS format)
-  const totalDurationMinutes = (apiCourse.curriculum || []).reduce((acc, section) => {
-    return (
-      acc +
-      section.lessons.reduce((lAcc, lesson) => {
-        if (!lesson.duration) return lAcc;
-        const parts = lesson.duration.split(":").map(Number);
-        if (parts.length === 2) {
-          return lAcc + parts[0] * 60 + parts[1];
-        } else if (parts.length === 1) {
-          return lAcc + parts[0];
-        }
-        return lAcc;
-      }, 0)
-    );
-  }, 0);
+  const totalDurationMinutes = (apiCourse.curriculum || []).reduce(
+    (acc, section) => {
+      return (
+        acc +
+        section.lessons.reduce((lAcc, lesson) => {
+          if (!lesson.duration) return lAcc;
+          const parts = lesson.duration.split(":").map(Number);
+          if (parts.length === 2) {
+            return lAcc + parts[0] * 60 + parts[1];
+          } else if (parts.length === 1) {
+            return lAcc + parts[0];
+          }
+          return lAcc;
+        }, 0)
+      );
+    },
+    0,
+  );
 
   const formattedDuration =
     totalDurationMinutes > 0
@@ -107,7 +116,11 @@ export default async function CourseDetailPage({ params }: Props) {
 
   // Override values for display
   course.lessons = totalLessons;
-  if (course.duration === "N/A" || !apiCourse.duration || apiCourse.duration === "00h 00m") {
+  if (
+    course.duration === "N/A" ||
+    !apiCourse.duration ||
+    apiCourse.duration === "00h 00m"
+  ) {
     course.duration = formattedDuration;
   }
 
@@ -118,13 +131,19 @@ export default async function CourseDetailPage({ params }: Props) {
         <div className="mx-auto w-full max-w-screen-2xl px-4 py-3 lg:px-6">
           <ol className="flex items-center gap-1 text-[12px] font-semibold text-slate-500">
             <li>
-              <Link href="/" className="hover:text-indigo-600 transition-colors">
+              <Link
+                href="/"
+                className="hover:text-indigo-600 transition-colors"
+              >
                 হোম
               </Link>
             </li>
             <ChevronRight className="h-3 w-3" />
             <li>
-              <Link href="/courses" className="hover:text-indigo-600 transition-colors">
+              <Link
+                href="/courses"
+                className="hover:text-indigo-600 transition-colors"
+              >
                 কোর্সসমূহ
               </Link>
             </li>
@@ -141,10 +160,14 @@ export default async function CourseDetailPage({ params }: Props) {
             {/* Left */}
             <div className="flex flex-col gap-4">
               <div className="flex flex-wrap gap-2">
-                <span className={`rounded-full px-3 py-1 text-[11px] font-bold ${course.categoryColor}`}>
+                <span
+                  className={`rounded-full px-3 py-1 text-[11px] font-bold ${course.categoryColor}`}
+                >
                   {course.category}
                 </span>
-                <span className={`rounded-full px-3 py-1 text-[11px] font-bold ${course.levelColor}`}>
+                <span
+                  className={`rounded-full px-3 py-1 text-[11px] font-bold ${course.levelColor}`}
+                >
                   {course.level}
                 </span>
                 {course.isBestseller && (
@@ -171,9 +194,13 @@ export default async function CourseDetailPage({ params }: Props) {
               {/* Rating */}
               <div className="flex flex-wrap items-center gap-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-base font-black text-amber-400">{course.rating}</span>
+                  <span className="text-base font-black text-amber-400">
+                    {course.rating}
+                  </span>
                   <StarRating rating={course.rating} size="md" />
-                  <span className="text-[12px] text-slate-400">({course.reviews.toLocaleString()} রিভিউ)</span>
+                  <span className="text-[12px] text-slate-400">
+                    ({course.reviews.toLocaleString()} রিভিউ)
+                  </span>
                 </div>
                 <span className="flex items-center gap-1 text-[12px] text-slate-400">
                   <Users className="h-3.5 w-3.5" />
@@ -192,7 +219,9 @@ export default async function CourseDetailPage({ params }: Props) {
                 />
                 <div>
                   <p className="text-[11px] text-slate-400">শিক্ষক</p>
-                  <p className="text-sm font-bold text-indigo-300">{course.instructor}</p>
+                  <p className="text-sm font-bold text-indigo-300">
+                    {course.instructor}
+                  </p>
                 </div>
               </div>
 
@@ -237,7 +266,9 @@ export default async function CourseDetailPage({ params }: Props) {
           <div className="flex flex-col gap-10">
             {/* What you'll learn */}
             <section className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-lg font-black text-slate-900">আপনি যা শিখবেন</h2>
+              <h2 className="mb-4 text-lg font-black text-slate-900">
+                আপনি যা শিখবেন
+              </h2>
               <div className="grid gap-3 sm:grid-cols-2">
                 {whatYouLearn.map((item, i) => (
                   <div key={i} className="flex items-start gap-2">
@@ -251,9 +282,12 @@ export default async function CourseDetailPage({ params }: Props) {
             {/* Course Curriculum */}
             {curriculum.length > 0 && (
               <section>
-                <h2 className="mb-4 text-lg font-black text-slate-900">কোর্স কারিকুলাম</h2>
+                <h2 className="mb-4 text-lg font-black text-slate-900">
+                  কোর্স কারিকুলাম
+                </h2>
                 <p className="mb-4 text-[13px] text-slate-500">
-                  {curriculum.length} টি সেকশন • {totalLessons} টি লেসন • {course.duration} মোট সময়
+                  {curriculum.length} টি সেকশন • {totalLessons} টি লেসন •{" "}
+                  {course.duration} মোট সময়
                 </p>
                 <div className="flex flex-col gap-3">
                   {curriculum.map((section, si) => (
@@ -267,7 +301,9 @@ export default async function CourseDetailPage({ params }: Props) {
                           <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-indigo-50 text-[12px] font-black text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
                             {si + 1}
                           </span>
-                          <span className="text-sm font-bold text-slate-900">{section.section}</span>
+                          <span className="text-sm font-bold text-slate-900">
+                            {section.section}
+                          </span>
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="text-[11px] font-semibold text-slate-400">
@@ -278,7 +314,10 @@ export default async function CourseDetailPage({ params }: Props) {
                       </summary>
                       <ul className="divide-y divide-slate-50 border-t border-slate-100 px-4 pb-2">
                         {section.lessons.map((lesson, li) => (
-                          <li key={li} className="flex items-center justify-between gap-3 py-3.5 group/lesson">
+                          <li
+                            key={li}
+                            className="flex items-center justify-between gap-3 py-3.5 group/lesson"
+                          >
                             <div className="flex items-center gap-3">
                               {lesson.type === "video" ? (
                                 <PlayCircle className="h-4 w-4 flex-shrink-0 text-indigo-400 group-hover/lesson:text-indigo-600" />
@@ -305,7 +344,9 @@ export default async function CourseDetailPage({ params }: Props) {
 
             {/* Instructor */}
             <section className="rounded-2xl border border-slate-100 bg-white p-6 shadow-sm">
-              <h2 className="mb-4 text-lg font-black text-slate-900">শিক্ষক পরিচিতি</h2>
+              <h2 className="mb-4 text-lg font-black text-slate-900">
+                শিক্ষক পরিচিতি
+              </h2>
               <div className="flex items-start gap-4">
                 <Image
                   src={course.instructorAvatar}
@@ -315,8 +356,12 @@ export default async function CourseDetailPage({ params }: Props) {
                   className="h-18 w-18 flex-shrink-0 rounded-full object-cover"
                 />
                 <div className="flex flex-col gap-1">
-                  <h3 className="text-base font-black text-slate-900">{course.instructor}</h3>
-                  <p className="text-[12px] font-semibold text-indigo-600">{course.category} বিশেষজ্ঞ</p>
+                  <h3 className="text-base font-black text-slate-900">
+                    {course.instructor}
+                  </h3>
+                  <p className="text-[12px] font-semibold text-indigo-600">
+                    {course.category} বিশেষজ্ঞ
+                  </p>
                   <div className="flex flex-wrap gap-3 pt-1 text-[12px] text-slate-500">
                     <span className="flex items-center gap-1">
                       <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
@@ -331,7 +376,9 @@ export default async function CourseDetailPage({ params }: Props) {
                       {course.lessons} লেসন
                     </span>
                   </div>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600">{instructorBio}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                    {instructorBio}
+                  </p>
                 </div>
               </div>
             </section>
@@ -349,7 +396,15 @@ export default async function CourseDetailPage({ params }: Props) {
   );
 }
 
-function EnrollmentCard({ course, mobile, isLoggedIn }: { course: Course; mobile?: boolean; isLoggedIn: boolean }) {
+function EnrollmentCard({
+  course,
+  mobile,
+  isLoggedIn,
+}: {
+  course: Course;
+  mobile?: boolean;
+  isLoggedIn: boolean;
+}) {
   return (
     <div
       className={`overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl ${mobile ? "w-full" : ""}`}
@@ -376,9 +431,13 @@ function EnrollmentCard({ course, mobile, isLoggedIn }: { course: Course; mobile
       <div className="p-5">
         {/* Price */}
         <div className="flex items-baseline gap-3">
-          <span className="text-3xl font-black text-slate-900">{course.price}</span>
+          <span className="text-3xl font-black text-slate-900">
+            {course.price}
+          </span>
           {course.originalPrice && (
-            <span className="text-base font-semibold text-slate-400 line-through">{course.originalPrice}</span>
+            <span className="text-base font-semibold text-slate-400 line-through">
+              {course.originalPrice}
+            </span>
           )}
           {course.originalPrice && (
             <span className="rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-black text-green-700">
@@ -387,35 +446,54 @@ function EnrollmentCard({ course, mobile, isLoggedIn }: { course: Course; mobile
           )}
         </div>
 
-        {/* CTA */}
         <div className="mt-4 flex flex-col gap-3">
           {isLoggedIn ? (
-            <button className="w-full rounded-xl bg-indigo-600 py-3.5 text-sm font-black text-white shadow-sm shadow-indigo-200 transition hover:bg-indigo-700 active:scale-[0.98]">
-              এখনই ভর্তি হোন
-            </button>
+            <EnrollButton courseId={Number(course.id)} />
           ) : (
             <Link
               href="/login"
               className="flex w-full items-center justify-center rounded-xl bg-indigo-600 py-3.5 text-sm font-black text-white shadow-sm shadow-indigo-200 transition hover:bg-indigo-700 active:scale-[0.98]"
             >
-              এখনই ভর্তি হোন
+              ভর্তির আবেদন করুন
             </Link>
           )}
         </div>
 
-        <p className="mt-3 text-center text-[11px] text-slate-400">৩০ দিনের মানি-ব্যাক গ্যারান্টি</p>
+        <p className="mt-3 text-center text-[11px] text-slate-400">
+          ৩০ দিনের মানি-ব্যাক গ্যারান্টি
+        </p>
 
         {/* Includes */}
         <div className="mt-5 flex flex-col gap-2.5 border-t border-slate-100 pt-4">
-          <p className="text-[12px] font-black uppercase tracking-wider text-slate-500">এই কোর্সে আছে</p>
+          <p className="text-[12px] font-black uppercase tracking-wider text-slate-500">
+            এই কোর্সে আছে
+          </p>
           {[
-            { icon: <Clock className="h-4 w-4" />, text: `${course.duration} অন-ডিমান্ড ভিডিও` },
-            { icon: <BookOpen className="h-4 w-4" />, text: `${course.lessons} টি লেসন` },
-            { icon: <Infinity className="h-4 w-4" />, text: "লাইফটাইম অ্যাক্সেস" },
-            { icon: <Smartphone className="h-4 w-4" />, text: "মোবাইল ও ডেস্কটপে দেখুন" },
-            { icon: <Award className="h-4 w-4" />, text: "সমাপ্তি সার্টিফিকেট" },
+            {
+              icon: <Clock className="h-4 w-4" />,
+              text: `${course.duration} অন-ডিমান্ড ভিডিও`,
+            },
+            {
+              icon: <BookOpen className="h-4 w-4" />,
+              text: `${course.lessons} টি লেসন`,
+            },
+            {
+              icon: <Infinity className="h-4 w-4" />,
+              text: "লাইফটাইম অ্যাক্সেস",
+            },
+            {
+              icon: <Smartphone className="h-4 w-4" />,
+              text: "মোবাইল ও ডেস্কটপে দেখুন",
+            },
+            {
+              icon: <Award className="h-4 w-4" />,
+              text: "সমাপ্তি সার্টিফিকেট",
+            },
           ].map((item, i) => (
-            <div key={i} className="flex items-center gap-2 text-[13px] text-slate-700">
+            <div
+              key={i}
+              className="flex items-center gap-2 text-[13px] text-slate-700"
+            >
               <span className="text-indigo-500">{item.icon}</span>
               {item.text}
             </div>

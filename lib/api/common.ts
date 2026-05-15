@@ -18,17 +18,27 @@ export async function getAdminToken() {
   return cookieStore.get("admin_token")?.value;
 }
 
+export async function getStudentToken() {
+  const cookieStore = await cookies();
+  return cookieStore.get("student_token")?.value;
+}
+
 export async function fetchApi(
   path: string,
   init?: RequestInit,
-  options?: { includeAuth?: boolean },
+  options?: { includeAuth?: boolean; authType?: "admin" | "student" },
 ) {
   if (!API_BASE_URL) {
     throw new Error("API base URL is not defined.");
   }
 
   const includeAuth = options?.includeAuth ?? true;
-  const token = includeAuth ? await getAdminToken() : undefined;
+  const authType = options?.authType ?? "admin";
+  
+  let token: string | undefined;
+  if (includeAuth) {
+    token = authType === "admin" ? await getAdminToken() : await getStudentToken();
+  }
 
   return fetch(`${API_BASE_URL}${path}`, {
     cache: "no-store",
