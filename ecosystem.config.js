@@ -1,10 +1,10 @@
 module.exports = {
-  apps : [{
+  apps: [{
     name: "yreri",
     script: "npm",
     args: "start",
     env: {
-      PORT: 8080,
+      PORT: 3080,
       NODE_ENV: "production",
     }
   }]
