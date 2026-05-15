@@ -19,6 +19,7 @@ import { getPublicCourseById, getPublicCoursesList } from "@/lib/api/courses";
 import { getStudent } from "@/lib/api/student-auth";
 import { mapApiToCourse } from "@/lib/course-mapper";
 import { EnrollButton } from "@/components/customer/courses/enroll-button";
+import { getMyEnrollmentsList } from "@/lib/api/enrollments";
 import { type Course } from "@/components/customer/courses/course-card";
 import type { Metadata } from "next";
 
@@ -122,6 +123,16 @@ export default async function CourseDetailPage({ params }: Props) {
     apiCourse.duration === "00h 00m"
   ) {
     course.duration = formattedDuration;
+  }
+
+  // Fetch enrollment status if student is logged in
+  let enrollmentStatus: string | null = null;
+  if (student) {
+    const enrollments = await getMyEnrollmentsList();
+    const currentEnrollment = enrollments.items.find(e => e.course_id === Number(id));
+    if (currentEnrollment) {
+      enrollmentStatus = currentEnrollment.status;
+    }
   }
 
   return (
@@ -248,7 +259,7 @@ export default async function CourseDetailPage({ params }: Props) {
 
             {/* Right — Enrollment Card (desktop) */}
             <div className="hidden lg:block">
-              <EnrollmentCard course={course} isLoggedIn={!!student} />
+              <EnrollmentCard course={course} isLoggedIn={!!student} status={enrollmentStatus} />
             </div>
           </div>
         </div>
@@ -256,7 +267,7 @@ export default async function CourseDetailPage({ params }: Props) {
 
       {/* Mobile Enrollment Card */}
       <div className="mx-auto w-full max-w-screen-2xl px-4 py-4 lg:hidden lg:px-6">
-        <EnrollmentCard course={course} isLoggedIn={!!student} mobile />
+        <EnrollmentCard course={course} isLoggedIn={!!student} status={enrollmentStatus} mobile />
       </div>
 
       {/* Body */}
@@ -387,7 +398,7 @@ export default async function CourseDetailPage({ params }: Props) {
           {/* Sticky Enrollment Card (desktop) */}
           <div className="hidden lg:block">
             <div className="sticky top-6">
-              <EnrollmentCard course={course} isLoggedIn={!!student} />
+              <EnrollmentCard course={course} isLoggedIn={!!student} status={enrollmentStatus} />
             </div>
           </div>
         </div>
@@ -400,10 +411,12 @@ function EnrollmentCard({
   course,
   mobile,
   isLoggedIn,
+  status,
 }: {
   course: Course;
   mobile?: boolean;
   isLoggedIn: boolean;
+  status: string | null;
 }) {
   return (
     <div
@@ -448,7 +461,7 @@ function EnrollmentCard({
 
         <div className="mt-4 flex flex-col gap-3">
           {isLoggedIn ? (
-            <EnrollButton courseId={Number(course.id)} />
+            <EnrollButton courseId={Number(course.id)} initialStatus={status} />
           ) : (
             <Link
               href="/login"

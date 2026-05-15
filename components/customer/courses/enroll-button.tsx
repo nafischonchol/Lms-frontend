@@ -7,17 +7,22 @@ import { toast } from "react-hot-toast";
 
 interface EnrollButtonProps {
   courseId: number;
+  initialStatus: string | null;
 }
 
-export function EnrollButton({ courseId }: EnrollButtonProps) {
+export function EnrollButton({ courseId, initialStatus }: EnrollButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [status, setStatus] = useState<string | null>(initialStatus);
 
   const handleEnroll = async () => {
+    if (status) return; // Prevent clicking if already has a status
+
     setIsLoading(true);
     try {
       const result = await enrollInCourseAction(courseId);
       if (result.ok) {
         toast.success(result.message);
+        setStatus("pending");
       } else {
         toast.error(result.message);
       }
@@ -27,6 +32,30 @@ export function EnrollButton({ courseId }: EnrollButtonProps) {
       setIsLoading(false);
     }
   };
+
+  if (status === "approved") {
+    return (
+      <div className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-100 py-3.5 text-sm font-black text-emerald-700">
+        আপনি এই কোর্সে ভর্তি আছেন
+      </div>
+    );
+  }
+
+  if (status === "pending") {
+    return (
+      <div className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-100 py-3.5 text-sm font-black text-amber-700">
+        আবেদন পেন্ডিং আছে
+      </div>
+    );
+  }
+
+  if (status === "rejected") {
+    return (
+      <div className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-100 py-3.5 text-sm font-black text-red-700">
+        আবেদনটি রিজেক্ট করা হয়েছে
+      </div>
+    );
+  }
 
   return (
     <button
