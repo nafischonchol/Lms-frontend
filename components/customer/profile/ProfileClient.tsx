@@ -42,6 +42,47 @@ interface ProfileClientProps {
 export function ProfileClient({ student, enrollments }: ProfileClientProps) {
   const [activeTab, setActiveTab] = useState("overview");
 
+  const renderCourseCard = (enrollment: EnrollmentApiModel) => (
+    <Card key={enrollment.id} className="rounded-[1.5rem] border-none shadow-sm hover:shadow-xl transition-all overflow-hidden bg-white group flex flex-col">
+      {/* Course Thumbnail */}
+      <div className="relative h-48 w-full overflow-hidden">
+        <img 
+          src={enrollment.course?.thumbnail || "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&q=80"} 
+          alt={enrollment.course?.title}
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+        <div className="absolute top-4 right-4 bg-emerald-600 text-white text-[10px] font-bold px-3 py-1 rounded-md">
+          চলমান
+        </div>
+      </div>
+
+      {/* Course Details */}
+      <div className="p-6 flex-1 flex flex-col">
+        <h3 className="text-xl font-bold text-slate-900 mb-2 line-clamp-2 min-h-[3.5rem] group-hover:text-emerald-600 transition-colors">
+          {enrollment.course?.title}
+        </h3>
+        <p className="text-sm text-slate-500 mb-6">প্রশিক্ষক: ড. আনিসুর রহমান</p>
+        
+        <div className="mt-auto space-y-3">
+          {(enrollment.course?.mode === "online" || enrollment.course?.mode === "hybrid") && (
+            <>
+              <div className="flex justify-between items-center text-xs font-bold text-slate-400">
+                <span>অগ্রগতি</span>
+                <span className="text-emerald-600">৭৫%</span>
+              </div>
+              <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-emerald-600 rounded-full" 
+                  style={{ width: "75%" }}
+                ></div>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </Card>
+  );
+
   const sidebarItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "courses", label: "My Courses", icon: Book },
@@ -130,12 +171,14 @@ export function ProfileClient({ student, enrollments }: ProfileClientProps) {
         <div className="space-y-8">
           {activeTab === "overview" && (
             <>
-              {/* Enrolled Courses Header */}
-              <div className="flex items-center justify-between px-2">
-                <h2 className="text-2xl font-bold text-slate-900">এনরোল করা কোর্সসমূহ</h2>
-                <Link href="/courses" className="text-sm font-bold text-emerald-600 flex items-center gap-1 hover:gap-2 transition-all">
+             
+
+              {/* Recent Enrolled Courses Header */}
+              <div className="flex items-center justify-between px-2 mt-8">
+                <h2 className="text-2xl font-bold text-slate-900">সাম্প্রতিক কোর্সসমূহ</h2>
+                <button onClick={() => setActiveTab("courses")} className="text-sm font-bold text-emerald-600 flex items-center gap-1 hover:gap-2 transition-all">
                   সবগুলো দেখুন <ChevronRight className="h-4 w-4" />
-                </Link>
+                </button>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -148,46 +191,30 @@ export function ProfileClient({ student, enrollments }: ProfileClientProps) {
                     </Link>
                   </Card>
                 ) : (
-                  enrollments.map((enrollment) => (
-                    <Card key={enrollment.id} className="rounded-[1.5rem] border-none shadow-sm hover:shadow-xl transition-all overflow-hidden bg-white group flex flex-col">
-                      {/* Course Thumbnail */}
-                      <div className="relative h-48 w-full overflow-hidden">
-                        <img 
-                          src={enrollment.course?.thumbnail || "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&q=80"} 
-                          alt={enrollment.course?.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute top-4 right-4 bg-emerald-600 text-white text-[10px] font-bold px-3 py-1 rounded-md">
-                          চলমান
-                        </div>
-                      </div>
-
-                      {/* Course Details */}
-                      <div className="p-6 flex-1 flex flex-col">
-                        <h3 className="text-xl font-bold text-slate-900 mb-2 line-clamp-2 min-h-[3.5rem] group-hover:text-emerald-600 transition-colors">
-                          {enrollment.course?.title}
-                        </h3>
-                        <p className="text-sm text-slate-500 mb-6">প্রশিক্ষক: ড. আনিসুর রহমান</p>
-                        
-                        <div className="mt-auto space-y-3">
-                          {(enrollment.course?.mode === "online" || enrollment.course?.mode === "hybrid") && (
-                            <>
-                              <div className="flex justify-between items-center text-xs font-bold text-slate-400">
-                                <span>অগ্রগতি</span>
-                                <span className="text-emerald-600">৭৫%</span>
-                              </div>
-                              <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                                <div 
-                                  className="h-full bg-emerald-600 rounded-full" 
-                                  style={{ width: "75%" }}
-                                ></div>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </Card>
-                  ))
+                  enrollments.slice(0, 3).map(renderCourseCard)
+                )}
+              </div>
+            </>
+          )}
+          
+          {activeTab === "courses" && (
+            <>
+              {/* Enrolled Courses Header */}
+              <div className="flex items-center justify-between px-2 mb-2">
+                <h2 className="text-2xl font-bold text-slate-900">আমার সকল কোর্সসমূহ</h2>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {enrollments.length === 0 ? (
+                  <Card className="col-span-full rounded-[2rem] border-2 border-dashed border-slate-200 p-12 text-center bg-white">
+                    <BookOpen className="h-12 w-12 text-slate-200 mx-auto mb-4" />
+                    <p className="text-slate-500 font-medium">আপনি এখনও কোনো কোর্সে ভর্তি হননি</p>
+                    <Link href="/courses">
+                      <Button className="mt-4 bg-[#10111d] text-white rounded-xl">কোর্সগুলো দেখুন</Button>
+                    </Link>
+                  </Card>
+                ) : (
+                  enrollments.map(renderCourseCard)
                 )}
               </div>
             </>
