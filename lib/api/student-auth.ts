@@ -146,3 +146,106 @@ export async function getStudent() {
     return null;
   }
 }
+
+export async function studentUpdateProfileAction(
+  formData: FormData,
+): Promise<AuthResult> {
+  if (!API_BASE_URL) {
+    return { ok: false, message: "API base URL is not defined." };
+  }
+
+  const name = formData.get("name");
+  const phone = formData.get("phone");
+  const email = formData.get("email");
+
+  const token = await getStudentToken();
+  if (!token) {
+    return { ok: false, message: "Unauthorized" };
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/student/profile`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ name, phone, email }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        ok: false,
+        message: data.message || "Failed to update profile.",
+        errors: data.errors,
+      };
+    }
+
+    if (data?.resources) {
+      const cookieStore = await cookies();
+      cookieStore.set("student", JSON.stringify(data.resources), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+      });
+    }
+
+    return { ok: true, message: "Profile updated successfully!" };
+  } catch (error) {
+    return {
+      ok: false,
+      message: "Something went wrong. Please try again later.",
+    };
+  }
+}
+
+export async function studentUpdatePasswordAction(
+  formData: FormData,
+): Promise<AuthResult> {
+  if (!API_BASE_URL) {
+    return { ok: false, message: "API base URL is not defined." };
+  }
+
+  const current_password = formData.get("current_password");
+  const password = formData.get("password");
+  const password_confirmation = formData.get("password_confirmation");
+
+  const token = await getStudentToken();
+  if (!token) {
+    return { ok: false, message: "Unauthorized" };
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/student/password`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ current_password, password, password_confirmation }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return {
+        ok: false,
+        message: data.message || "Failed to update password.",
+        errors: data.errors,
+      };
+    }
+
+    return { ok: true, message: "Password updated successfully!" };
+  } catch (error) {
+    return {
+      ok: false,
+      message: "Something went wrong. Please try again later.",
+    };
+  }
+}

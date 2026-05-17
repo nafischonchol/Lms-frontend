@@ -19,13 +19,15 @@ import {
   CheckCircle2,
   Trophy,
   Star,
-  GraduationCap
+  GraduationCap,
+  Lock
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { studentLogoutAction } from "@/lib/api/student-auth";
+import { studentLogoutAction, studentUpdateProfileAction, studentUpdatePasswordAction } from "@/lib/api/student-auth";
 import { type EnrollmentApiModel } from "@/lib/api/enrollments";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 interface ProfileClientProps {
   student: {
@@ -43,9 +45,8 @@ export function ProfileClient({ student, enrollments }: ProfileClientProps) {
   const sidebarItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "courses", label: "My Courses", icon: Book },
-    { id: "achievements", label: "Achievements", icon: Trophy },
-    { id: "messages", label: "Messages", icon: MessageSquare },
-    { id: "settings", label: "Settings", icon: Settings },
+    { id: "edit", label: "Edit Profile", icon: Settings },
+    { id: "security", label: "Security", icon: Lock },
   ];
 
   return (
@@ -126,74 +127,132 @@ export function ProfileClient({ student, enrollments }: ProfileClientProps) {
           </div>
         </div>
 
-        {/* Content Tabs */}
-        <div className="flex gap-8 border-b border-slate-200 mb-8 px-4">
-          <button className="pb-4 text-slate-900 font-bold border-b-2 border-slate-900">ওভারভিউ</button>
-          <button className="pb-4 text-slate-400 font-bold hover:text-slate-600">প্রোফাইল এডিট করুন</button>
-          <button className="pb-4 text-slate-400 font-bold hover:text-slate-600">নিরাপত্তা</button>
-        </div>
-
         <div className="space-y-8">
-          {/* Enrolled Courses Header */}
-          <div className="flex items-center justify-between px-2">
-            <h2 className="text-2xl font-bold text-slate-900">এনরোল করা কোর্সসমূহ</h2>
-            <Link href="/courses" className="text-sm font-bold text-emerald-600 flex items-center gap-1 hover:gap-2 transition-all">
-              সবগুলো দেখুন <ChevronRight className="h-4 w-4" />
-            </Link>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {enrollments.length === 0 ? (
-              <Card className="col-span-full rounded-[2rem] border-2 border-dashed border-slate-200 p-12 text-center bg-white">
-                <BookOpen className="h-12 w-12 text-slate-200 mx-auto mb-4" />
-                <p className="text-slate-500 font-medium">আপনি এখনও কোনো কোর্সে ভর্তি হননি</p>
-                <Link href="/courses">
-                  <Button className="mt-4 bg-[#10111d] text-white rounded-xl">কোর্সগুলো দেখুন</Button>
+          {activeTab === "overview" && (
+            <>
+              {/* Enrolled Courses Header */}
+              <div className="flex items-center justify-between px-2">
+                <h2 className="text-2xl font-bold text-slate-900">এনরোল করা কোর্সসমূহ</h2>
+                <Link href="/courses" className="text-sm font-bold text-emerald-600 flex items-center gap-1 hover:gap-2 transition-all">
+                  সবগুলো দেখুন <ChevronRight className="h-4 w-4" />
                 </Link>
-              </Card>
-            ) : (
-              enrollments.map((enrollment) => (
-                <Card key={enrollment.id} className="rounded-[1.5rem] border-none shadow-sm hover:shadow-xl transition-all overflow-hidden bg-white group flex flex-col">
-                  {/* Course Thumbnail */}
-                  <div className="relative h-48 w-full overflow-hidden">
-                    <img 
-                      src={enrollment.course?.thumbnail || "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&q=80"} 
-                      alt={enrollment.course?.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-4 right-4 bg-emerald-600 text-white text-[10px] font-bold px-3 py-1 rounded-md">
-                      চলমান
-                    </div>
-                  </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {enrollments.length === 0 ? (
+                  <Card className="col-span-full rounded-[2rem] border-2 border-dashed border-slate-200 p-12 text-center bg-white">
+                    <BookOpen className="h-12 w-12 text-slate-200 mx-auto mb-4" />
+                    <p className="text-slate-500 font-medium">আপনি এখনও কোনো কোর্সে ভর্তি হননি</p>
+                    <Link href="/courses">
+                      <Button className="mt-4 bg-[#10111d] text-white rounded-xl">কোর্সগুলো দেখুন</Button>
+                    </Link>
+                  </Card>
+                ) : (
+                  enrollments.map((enrollment) => (
+                    <Card key={enrollment.id} className="rounded-[1.5rem] border-none shadow-sm hover:shadow-xl transition-all overflow-hidden bg-white group flex flex-col">
+                      {/* Course Thumbnail */}
+                      <div className="relative h-48 w-full overflow-hidden">
+                        <img 
+                          src={enrollment.course?.thumbnail || "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=800&q=80"} 
+                          alt={enrollment.course?.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute top-4 right-4 bg-emerald-600 text-white text-[10px] font-bold px-3 py-1 rounded-md">
+                          চলমান
+                        </div>
+                      </div>
 
-                  {/* Course Details */}
-                  <div className="p-6 flex-1 flex flex-col">
-                    <h3 className="text-xl font-bold text-slate-900 mb-2 line-clamp-2 min-h-[3.5rem] group-hover:text-emerald-600 transition-colors">
-                      {enrollment.course?.title}
-                    </h3>
-                    <p className="text-sm text-slate-500 mb-6">প্রশিক্ষক: ড. আনিসুর রহমান</p>
-                    
-                    <div className="mt-auto space-y-3">
-                      {(enrollment.course?.mode === "online" || enrollment.course?.mode === "hybrid") && (
-                        <>
-                          <div className="flex justify-between items-center text-xs font-bold text-slate-400">
-                            <span>অগ্রগতি</span>
-                            <span className="text-emerald-600">৭৫%</span>
-                          </div>
-                          <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-emerald-600 rounded-full" 
-                              style={{ width: "75%" }}
-                            ></div>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </Card>
-              ))
-            )}
-          </div>
+                      {/* Course Details */}
+                      <div className="p-6 flex-1 flex flex-col">
+                        <h3 className="text-xl font-bold text-slate-900 mb-2 line-clamp-2 min-h-[3.5rem] group-hover:text-emerald-600 transition-colors">
+                          {enrollment.course?.title}
+                        </h3>
+                        <p className="text-sm text-slate-500 mb-6">প্রশিক্ষক: ড. আনিসুর রহমান</p>
+                        
+                        <div className="mt-auto space-y-3">
+                          {(enrollment.course?.mode === "online" || enrollment.course?.mode === "hybrid") && (
+                            <>
+                              <div className="flex justify-between items-center text-xs font-bold text-slate-400">
+                                <span>অগ্রগতি</span>
+                                <span className="text-emerald-600">৭৫%</span>
+                              </div>
+                              <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-emerald-600 rounded-full" 
+                                  style={{ width: "75%" }}
+                                ></div>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </>
+          )}
+          {activeTab === "edit" && (
+            <Card className="rounded-[1.5rem] border-none shadow-sm bg-white p-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">প্রোফাইল তথ্য আপডেট করুন</h2>
+              <form action={async (formData) => {
+                const res = await studentUpdateProfileAction(formData);
+                if (res.ok) {
+                  toast.success(res.message);
+                  window.location.reload();
+                } else {
+                  toast.error(res.message);
+                }
+              }} className="space-y-6 max-w-2xl">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">পুরো নাম</label>
+                  <input name="name" defaultValue={student.name} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500" required />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">ইমেইল</label>
+                  <input type="email" name="email" defaultValue={student.email} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500" required />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">ফোন নম্বর</label>
+                  <input type="tel" name="phone" defaultValue={student.phone || ""} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500" />
+                </div>
+                <Button type="submit" className="bg-[#10111d] hover:bg-[#1a1c2e] text-white rounded-xl px-8 py-6 font-bold w-full sm:w-auto">
+                  পরিবর্তন সেভ করুন
+                </Button>
+              </form>
+            </Card>
+          )}
+          {activeTab === "security" && (
+            <Card className="rounded-[1.5rem] border-none shadow-sm bg-white p-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">পাসওয়ার্ড পরিবর্তন করুন</h2>
+              <form action={async (formData) => {
+                const res = await studentUpdatePasswordAction(formData);
+                if (res.ok) {
+                  toast.success(res.message);
+                  const form = document.getElementById("password-form") as HTMLFormElement;
+                  if (form) form.reset();
+                } else {
+                  toast.error(res.message);
+                }
+              }} id="password-form" className="space-y-6 max-w-2xl">
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">বর্তমান পাসওয়ার্ড</label>
+                  <input type="password" name="current_password" placeholder="বর্তমান পাসওয়ার্ড দিন" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500" required />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">নতুন পাসওয়ার্ড</label>
+                  <input type="password" name="password" placeholder="নতুন পাসওয়ার্ড দিন" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500" required minLength={6} />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-slate-700">নতুন পাসওয়ার্ড নিশ্চিত করুন</label>
+                  <input type="password" name="password_confirmation" placeholder="আবার নতুন পাসওয়ার্ড দিন" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500" required minLength={6} />
+                </div>
+                <Button type="submit" className="bg-[#10111d] hover:bg-[#1a1c2e] text-white rounded-xl px-8 py-6 font-bold w-full sm:w-auto">
+                  পাসওয়ার্ড পরিবর্তন করুন
+                </Button>
+              </form>
+            </Card>
+          )}
         </div>
       </main>
     </div>
